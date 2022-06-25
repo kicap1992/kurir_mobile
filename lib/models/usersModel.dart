@@ -57,3 +57,119 @@ class KurirModel {
         "kenderaan_url": kenderaan_url,
       };
 }
+
+class Data {
+  String? sId;
+  String? email;
+  String? noTelp;
+  String? nama;
+  String? alamat;
+  String? photoUrl;
+  String? status;
+  List<String>? pengirimanBarang;
+
+  Data(
+      {this.sId,
+      this.email,
+      this.noTelp,
+      this.nama,
+      this.alamat,
+      this.photoUrl,
+      this.status,
+      this.pengirimanBarang});
+
+  Data.fromJson(Map<String, dynamic> json) {
+    sId = json['_id'];
+    email = json['email'];
+    noTelp = json['no_telp'];
+    nama = json['nama'];
+    alamat = json['alamat'];
+    photoUrl = json['photo_url'];
+    status = json['status'];
+    pengirimanBarang = json['pengiriman_barang'].cast<String>();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = sId;
+    data['email'] = email;
+    data['no_telp'] = noTelp;
+    data['nama'] = nama;
+    data['alamat'] = alamat;
+    data['photo_url'] = photoUrl;
+    data['status'] = status;
+    data['pengiriman_barang'] = pengirimanBarang;
+    return data;
+  }
+}
+
+class coba {
+  String? message;
+  List<Data>? data;
+
+  coba({this.message, this.data});
+
+  coba.fromJson(Map<String, dynamic> json) {
+    message = json['message'];
+    if (json['data'] != null) {
+      data = <Data>[];
+      json['data'].forEach((v) {
+        data!.add(Data.fromJson(v));
+      });
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['message'] = message;
+    if (this.data != null) {
+      data['data'] = this.data!.map((v) => v.toJson()).toList();
+    }
+    return data;
+  }
+}
+
+class PengirimModel {
+  String? sId;
+  String? email;
+  String? noTelp;
+  String? nama;
+  String? alamat;
+  String? photoUrl;
+  String? status;
+  List<String>? pengirimanBarang;
+
+  PengirimModel(
+      {this.sId,
+      this.email,
+      this.noTelp,
+      this.nama,
+      this.alamat,
+      this.photoUrl,
+      this.status,
+      this.pengirimanBarang});
+
+  PengirimModel.fromJson(Map<String, dynamic> json) {
+    sId = json['_id'];
+    email = json['email'];
+    noTelp = json['no_telp'];
+    nama = json['nama'];
+    alamat = json['alamat'];
+    photoUrl = json['photo_url'];
+    status = json['status'];
+    pengirimanBarang = json['pengiriman_barang'].cast<String>();
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['_id'] = sId;
+    data['email'] = email;
+    data['no_telp'] = noTelp;
+    data['nama'] = nama;
+    data['alamat'] = alamat;
+    data['photo_url'] = photoUrl;
+    data['status'] = status;
+    data['pengiriman_barang'] = pengirimanBarang;
+    return data;
+  }
+}

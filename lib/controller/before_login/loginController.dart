@@ -209,7 +209,7 @@ class LoginController extends GetxController {
       items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
-          label: 'Home',
+          label: 'Halaman Utama',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.login),
@@ -221,7 +221,7 @@ class LoginController extends GetxController {
         ),
       ],
       currentIndex: _indexTap.value,
-      selectedItemColor: const Color.fromARGB(255, 148, 183, 229),
+      selectedItemColor: const Color.fromARGB(255, 2, 72, 72),
       onTap: _onItemTapped,
     );
   }

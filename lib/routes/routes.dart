@@ -1,13 +1,16 @@
 import 'package:flutter/animation.dart';
 import 'package:get/get.dart';
 import 'package:kurir/binding/beforeEnterBinding.dart';
+import 'package:kurir/binding/infoPengirimanBinding.dart';
 import 'package:kurir/binding/kurirIndexBinding.dart';
 import 'package:kurir/binding/kurirProfileBinding.dart';
 // import 'package:kurir/binding/indexBinding.dart';
 import 'package:kurir/binding/pendaftaranKurirBinding.dart';
 import 'package:kurir/binding/pengirimIndexBinding.dart';
+import 'package:kurir/binding/pengirimProfileBinding.dart';
 import 'package:kurir/pages/after_login/before_enter.dart';
 import 'package:kurir/pages/after_login/kurir/profilePage.dart';
+import 'package:kurir/pages/after_login/pengirim/infoPengirimanPage.dart';
 import 'package:kurir/pages/after_login/pengirim/pengirimProfilePage.dart';
 import 'package:kurir/pages/before_login/daftar.dart';
 import 'package:kurir/pages/before_login/login.dart';
@@ -105,13 +108,24 @@ class Routes {
         binding: PengirimIndexBinding(),
         transition: Transition.native,
         transitionDuration: const Duration(seconds: 1),
+        children: [
+          GetPage(
+            name: '/infoPengiriman',
+            page: () => const InfoPengirimanPage(),
+            binding: InfoPengirimanBinding(),
+            transition: Transition.native,
+            transitionDuration: const Duration(seconds: 1),
+            curve: Curves.easeInOut,
+          ),
+          GetPage(
+            name: '/profilePengirim',
+            page: () => const PengirimProfilePage(),
+            binding: PengirimProfileBinding(),
+            transition: Transition.native,
+            transitionDuration: const Duration(seconds: 1),
+          )
+        ],
       ),
-      GetPage(
-        name: '/profilePengirim',
-        page: () => const PengirimProfilePage(),
-        transition: Transition.native,
-        transitionDuration: const Duration(seconds: 1),
-      )
     ];
   }
 }

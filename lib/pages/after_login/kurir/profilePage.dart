@@ -2,7 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kurir/controller/after_login/kurir/profileController.dart';
+
+import '../../../controller/after_login/kurir/profileController.dart';
+import '../../../widgets/appbar.dart';
+import '../../../widgets/boxBackgroundDecoration.dart';
 
 class ProfileKurirPage extends GetView<KurirProfileController> {
   const ProfileKurirPage({Key? key}) : super(key: key);
@@ -10,41 +13,54 @@ class ProfileKurirPage extends GetView<KurirProfileController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout_outlined),
-            onPressed: () {
-              // log("ini untuk logout");
-              // create get alert dialog
-              Get.dialog(AlertDialog(
-                title: const Text('Logout'),
-                content: const Text('Anda yakin ingin logout?'),
-                actions: [
-                  ElevatedButton(
-                    child: const Text('Yes'),
-                    onPressed: () {
-                      // log("ini untuk logout");
-                      Get.back();
-                      controller.logout();
-                    },
+      appBar: PreferredSize(
+        preferredSize:
+            Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
+        child: AppBarWidget(
+          header: "Halaman Profil",
+          autoLeading: false,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout_outlined),
+              onPressed: () {
+                // log("ini untuk logout");
+                // create get alert dialog
+                Get.dialog(
+                  AlertDialog(
+                    title: const Text('Logout'),
+                    content: const Text('Anda yakin ingin logout?'),
+                    actions: [
+                      ElevatedButton(
+                        child: const Text('Yes'),
+                        style: ElevatedButton.styleFrom(
+                          primary: Color.fromARGB(
+                              255, 104, 164, 164), //background color
+                          // onPrimary: Colors.black, //ripple color
+                        ),
+                        onPressed: () {
+                          // log("ini untuk logout");
+                          Get.back();
+                          controller.logout();
+                        },
+                      ),
+                      ElevatedButton(
+                        child: const Text('No'),
+                        style: ElevatedButton.styleFrom(
+                          primary:
+                              Color.fromARGB(255, 2, 72, 72), //background color
+                          // onPrimary: Colors.black, //ripple color
+                        ),
+                        onPressed: () {
+                          Get.back();
+                        },
+                      ),
+                    ],
                   ),
-                  ElevatedButton(
-                    child: const Text('No'),
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.red[400], //background color
-                      // onPrimary: Colors.black, //ripple color
-                    ),
-                    onPressed: () {
-                      Get.back();
-                    },
-                  ),
-                ],
-              ));
-            },
-          ),
-        ],
+                );
+              },
+            ),
+          ],
+        ),
       ),
       body: WillPopScope(
         onWillPop: () async {
@@ -53,8 +69,10 @@ class ProfileKurirPage extends GetView<KurirProfileController> {
           );
           return false;
         },
-        child: const Center(
-          child: Text('Profile'),
+        child: BoxBackgroundDecoration(
+          child: const Center(
+            child: Text('Profile'),
+          ),
         ),
       ),
     );

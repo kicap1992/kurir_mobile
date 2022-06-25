@@ -1,4 +1,6 @@
 // ignore_for_file: non_constant_identifier_names, file_names
+// ignore: unused_import
+import 'dart:developer' as dev;
 
 import 'dart:async';
 import 'dart:convert';
@@ -15,6 +17,67 @@ class KurirApi {
 
   static clientClose(http.Client client) {
     client.close();
+  }
+
+  // get all pengiriman status ='Dalam Pengesahan Kurir'
+  static Future<Map<String, dynamic>>
+      getAllPengirimanDalamPengesahanKurir() async {
+    client = http.Client();
+    late Map<String, dynamic> result;
+
+    bool _cek_jaringan = await cek_jaringan(client);
+
+    log("cek jaringan : " + _cek_jaringan.toString());
+    var storage = GetStorage();
+    var username = storage.read("username");
+    var password = storage.read("password");
+    var id = storage.read("id");
+
+    if (!_cek_jaringan) {
+      result = {
+        'status': 500,
+        'message':
+            "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
+      };
+    } else {
+      // wait for 3 sec
+      // await Future.delayed(Duration(seconds: 3));
+      // result = {'status': 200, 'message': "sini dia"};
+
+      try {
+        // log("${globals.http_to_server}api/kurir/get_all_kurir_dalam_pengesahan?username=$username&password=$password&id=$id");
+        var response = await client.get(
+            Uri.parse(
+                "${globals.http_to_server}api/kurir/pengiriman_kurir_dalam_pengesahan?username=$username&password=$password&id=$id"),
+            headers: {
+              "Accept": "application/json",
+              // "authorization":
+              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+              "crossDomain": "true"
+            }).timeout(const Duration(seconds: 10));
+        final data = jsonDecode(response.body);
+        // log(data.toString());
+        // log("ini status : " + response.statusCode.toString());
+        if (response.statusCode == 200) {
+          result = {
+            'status': 200,
+            'message': data['message'],
+            'data': data['data']
+          };
+        } else {
+          result = {'status': 400, 'message': "Server Error", 'data': data};
+        }
+      } catch (e) {
+        // dev.log(e.toString());
+        result = {
+          'status': 500,
+          'message':
+              "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
+        };
+      }
+    }
+
+    return result;
   }
 
   // cek pengaturan kurir

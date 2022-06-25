@@ -8,6 +8,8 @@ import 'package:kurir/widgets/boxBackgroundDecoration.dart';
 import 'package:kurir/widgets/focusToTextFormField.dart';
 import 'package:kurir/widgets/ourContainer.dart';
 
+import '../../widgets/appbar.dart';
+
 class PendaftaranPengirimPage extends GetView<PendaftaranPengirimController> {
   const PendaftaranPengirimPage({Key? key}) : super(key: key);
 
@@ -16,14 +18,19 @@ class PendaftaranPengirimPage extends GetView<PendaftaranPengirimController> {
     return WillPopScope(
       onWillPop: () async => controller.willPopScopeWidget(),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Pendaftaran Pengirim'),
-          actions: [
-            IconButton(
-              onPressed: () => controller.intro_message(),
-              icon: const Icon(Icons.info_outline),
-            ),
-          ],
+        appBar: PreferredSize(
+          preferredSize:
+              Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
+          child: AppBarWidget(
+            header: "Pendaftaran Pengirim",
+            autoLeading: true,
+            actions: [
+              IconButton(
+                onPressed: () => controller.intro_message(),
+                icon: const Icon(Icons.info_outline),
+              ),
+            ],
+          ),
         ),
         body: BoxBackgroundDecoration(
           child: SingleChildScrollView(
@@ -413,7 +420,17 @@ class PendaftaranPengirimPage extends GetView<PendaftaranPengirimController> {
                             );
                           }
                         },
-                        child: const Text('Daftar'),
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          'Daftar',
+                          style:
+                              TextStyle(color: Color.fromARGB(255, 2, 72, 72)),
+                        ),
                       ),
                     ),
                     SizedBox(

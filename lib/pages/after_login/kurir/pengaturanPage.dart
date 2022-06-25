@@ -2,12 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kurir/controller/after_login/kurir/pengaturanController.dart';
-import 'package:kurir/widgets/focusToTextFormField.dart';
-import 'package:kurir/widgets/ourContainer.dart';
-import 'package:kurir/widgets/thousandSeparator.dart';
 
+import '../../../controller/after_login/kurir/pengaturanController.dart';
 import '../../../widgets/boxBackgroundDecoration.dart';
+import '../../../widgets/focusToTextFormField.dart';
+import '../../../widgets/ourContainer.dart';
+import '../../../widgets/thousandSeparator.dart';
 
 class PengaturanKurirPage extends GetView<PengaturanKurirController> {
   const PengaturanKurirPage({Key? key}) : super(key: key);
@@ -45,29 +45,12 @@ class PengaturanKurirPage extends GetView<PengaturanKurirController> {
                       ),
                       EnsureVisibleWhenFocused(
                         focusNode: controller.minimalBiayaPengirimanFocusNode,
-                        child: TextFormField(
-                          // initialValue: 700.toString(),
+                        child: _PengaturanTextFormField(
                           controller:
                               controller.minimalBiayaPengirimanController,
+                          hintText: 'Minimal Biaya Pengiriman',
+                          labelText: 'Minimal Biaya Pengiriman',
                           focusNode: controller.minimalBiayaPengirimanFocusNode,
-                          keyboardType: TextInputType.number,
-                          maxLength: 6,
-                          inputFormatters: [ThousandsSeparatorInputFormatter()],
-                          decoration: InputDecoration(
-                            // suffix: ,
-                            // suffixText: ' / kg',
-                            // put suffixText before prefixText
-                            prefixText: 'Rp . ',
-
-                            hintText: 'Minimal Biaya Pengiriman',
-                            labelText: 'Minimal Biaya Pengiriman',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ),
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Minimal Biaya Pengiriman tidak boleh kosong';
@@ -88,33 +71,24 @@ class PengaturanKurirPage extends GetView<PengaturanKurirController> {
                       ),
                       EnsureVisibleWhenFocused(
                         focusNode: controller.maksimalBiayaPengirimanFocusNode,
-                        child: TextFormField(
+                        child: _PengaturanTextFormField(
                           controller:
                               controller.maksimalBiayaPengirimanController,
+                          hintText: 'Maksimal Biaya Pengiriman',
+                          labelText: 'Maksimal Biaya Pengiriman',
                           focusNode:
                               controller.maksimalBiayaPengirimanFocusNode,
-                          keyboardType: TextInputType.number,
-                          maxLength: 6,
-                          inputFormatters: [ThousandsSeparatorInputFormatter()],
-                          decoration: InputDecoration(
-                            // suffix: ,
-                            // suffixText: ' / kg',
-                            // put suffixText before prefixText
-                            prefixText: 'Rp . ',
-
-                            hintText: 'Maksimal Biaya Pengiriman',
-                            labelText: 'Maksimal Biaya Pengiriman',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ),
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Maksimal Biaya Pengiriman tidak boleh kosong';
                             }
+
+                            if (controller.removeComma(controller
+                                    .maksimalBiayaPengirimanController.text) <
+                                controller.removeComma(value)) {
+                              return 'Maksimal Biaya Pengiriman tidak boleh lebih besar dari Maksimal Biaya Pengiriman';
+                            }
+
                             return null;
                           },
                         ),
@@ -124,31 +98,17 @@ class PengaturanKurirPage extends GetView<PengaturanKurirController> {
                       ),
                       EnsureVisibleWhenFocused(
                         focusNode: controller.biayaPerKiloFocusNode,
-                        child: TextFormField(
+                        child: _PengaturanTextFormField(
                           controller: controller.biayaPerKiloController,
+                          hintText: 'Biaya Per Kilometer',
+                          labelText: 'Biaya Per Kilometer',
                           focusNode: controller.biayaPerKiloFocusNode,
-                          keyboardType: TextInputType.number,
-                          maxLength: 6,
-                          inputFormatters: [ThousandsSeparatorInputFormatter()],
-                          decoration: InputDecoration(
-                            // suffix: ,
-                            suffixText: ' / km',
-                            // put suffixText before prefixText
-                            prefixText: 'Rp . ',
-
-                            hintText: 'Biaya Per Kilometer',
-                            labelText: 'Biaya Per Kilometer',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: const BorderSide(
-                                color: Colors.grey,
-                              ),
-                            ),
-                          ),
+                          suffixText: ' / km',
                           validator: (value) {
                             if (value!.isEmpty) {
                               return 'Biaya Per Kilometer tidak boleh kosong';
                             }
+
                             return null;
                           },
                         ),
@@ -157,6 +117,12 @@ class PengaturanKurirPage extends GetView<PengaturanKurirController> {
                         height: 15,
                       ),
                       ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          primary: const Color.fromARGB(255, 2, 72, 72),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
                         onPressed: () {
                           // log()
                           if (controller.formKey.currentState!.validate()) {
@@ -175,8 +141,8 @@ class PengaturanKurirPage extends GetView<PengaturanKurirController> {
                                     ElevatedButton(
                                       child: const Text('Tidak'),
                                       style: ElevatedButton.styleFrom(
-                                        primary:
-                                            Colors.red[400], //background color
+                                        primary: const Color.fromARGB(255, 104,
+                                            164, 164), //background color
                                         // onPrimary: Colors.black, //ripple color
                                       ),
                                       onPressed: () {
@@ -185,6 +151,11 @@ class PengaturanKurirPage extends GetView<PengaturanKurirController> {
                                     ),
                                     ElevatedButton(
                                       child: const Text('Ya'),
+                                      style: ElevatedButton.styleFrom(
+                                        primary: const Color.fromARGB(
+                                            255, 2, 72, 72), //background color
+                                        // onPrimary: Colors.black, //ripple color
+                                      ),
                                       onPressed: () {
                                         controller.simpan();
                                         Navigator.of(context).pop();
@@ -228,6 +199,81 @@ class PengaturanKurirPage extends GetView<PengaturanKurirController> {
       //   currentIndex: 0,
       //   selectedItemColor: const Color.fromARGB(255, 148, 183, 229),
       // ),
+    );
+  }
+}
+
+class _PengaturanTextFormField extends StatelessWidget {
+  const _PengaturanTextFormField({
+    Key? key,
+    this.controller,
+    this.focusNode,
+    this.hintText,
+    this.labelText,
+    this.validator,
+    this.suffixText,
+  }) : super(key: key);
+
+  final TextEditingController? controller;
+  final FocusNode? focusNode;
+  final String? hintText;
+  final String? labelText;
+  final FormFieldValidator<String>? validator;
+  final String? suffixText;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      // initialValue: 700.toString(),
+      controller: controller,
+      focusNode: focusNode,
+      keyboardType: TextInputType.number,
+      maxLength: 6,
+      inputFormatters: [ThousandsSeparatorInputFormatter()],
+      decoration: InputDecoration(
+        // suffix: ,
+        // suffixText: ' / kg',
+        // put suffixText before prefixText
+        prefixText: 'Rp . ',
+        suffixText: suffixText,
+        hintText: hintText,
+        labelText: labelText,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(
+            color: Color.fromARGB(255, 2, 72, 72),
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(
+            color: Color.fromARGB(255, 2, 72, 72),
+            width: 1,
+          ),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(
+            color: Color.fromARGB(255, 104, 164, 164),
+            width: 1,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(
+            color: Color.fromARGB(255, 2, 72, 72),
+            width: 1,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(
+            color: Colors.red,
+            width: 1,
+          ),
+        ),
+      ),
+      validator: validator,
     );
   }
 }

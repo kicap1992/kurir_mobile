@@ -1,4 +1,4 @@
-// ignore_for_file: file_names, non_constant_identifier_names, invalid_use_of_protected_member
+// ignore_for_file: file_names, non_constant_identifier_names, invalid_use_of_protected_member, prefer_const_constructors
 
 import 'dart:async';
 import 'dart:collection';
@@ -27,6 +27,8 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:path_provider/path_provider.dart';
+
+import '../../../widgets/appbar.dart';
 
 class KirimBarangController extends GetxController {
   //////// begin of marking delivery location ///////
@@ -412,15 +414,19 @@ class KirimBarangController extends GetxController {
           child: Center(
             child: Column(
               children: [
-                AppBar(
-                  title: const Text('Pin Lokasi Pengiriman'),
-                  automaticallyImplyLeading: false,
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Get.back(),
-                    ),
-                  ],
+                PreferredSize(
+                  preferredSize: Size.fromHeight(
+                      MediaQuery.of(context).size.height * 0.08),
+                  child: AppBarWidget(
+                    header: "Pin Lokasi Pengiriman",
+                    autoLeading: false,
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Get.back(),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 15),
                 SizedBox(
@@ -556,7 +562,7 @@ class KirimBarangController extends GetxController {
                           duration: const Duration(seconds: 2),
                         );
                       } else {
-                        WidgetsBinding.instance?.focusManager.primaryFocus
+                        WidgetsBinding.instance!.focusManager.primaryFocus
                             ?.unfocus();
                         konfirmKelurahanDesaIndex = _pilihanKelurahanDesa;
                         konfirmMarker = _markerPosition;
@@ -579,7 +585,10 @@ class KirimBarangController extends GetxController {
                     style: ElevatedButton.styleFrom(
                       primary: (_pilihanKelurahanDesa == 0)
                           ? Colors.grey
-                          : Colors.blue,
+                          : Color.fromARGB(255, 104, 164, 164),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
                     ),
                   ),
                 )
@@ -1373,7 +1382,7 @@ class KirimBarangController extends GetxController {
           ElevatedButton(
             child: const Text('OK'),
             onPressed: () {
-              WidgetsBinding.instance?.focusManager.primaryFocus?.unfocus();
+              WidgetsBinding.instance!.focusManager.primaryFocus?.unfocus();
 
               selectedKurirNama = kurirModel.nama!;
               kurirOutroTextController.text = kurirModel.nama!;
@@ -1716,15 +1725,19 @@ class KirimBarangController extends GetxController {
           child: Center(
             child: Column(
               children: [
-                AppBar(
-                  title: const Text('Pin Lokasi Permulaan'),
-                  automaticallyImplyLeading: false,
-                  actions: [
-                    IconButton(
-                      icon: const Icon(Icons.close),
-                      onPressed: () => Get.back(),
-                    ),
-                  ],
+                PreferredSize(
+                  preferredSize: Size.fromHeight(
+                      MediaQuery.of(context).size.height * 0.08),
+                  child: AppBarWidget(
+                    header: "Pin Lokasi Permulaan",
+                    autoLeading: false,
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Get.back(),
+                      ),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 15),
                 SizedBox(
@@ -1821,26 +1834,26 @@ class KirimBarangController extends GetxController {
                     borderRadius: BorderRadius.circular(10),
                     color: Colors.white,
                   ),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      topRight: Radius.circular(10),
-                      bottomRight: Radius.circular(10),
-                      bottomLeft: Radius.circular(10),
-                    ),
-                    child: Obx(
-                      () => GoogleMap(
-                        mapType:
-                            mapTypenya.value ? MapType.normal : MapType.hybrid,
-                        mapToolbarEnabled: true,
-                        rotateGesturesEnabled: true,
-                        myLocationButtonEnabled: true,
-                        polygons: _polygons,
-                        markers: _markers,
-                        // liteModeEnabled: true,
-                        initialCameraPosition: _initialCameraPosition,
-                        onMapCreated: _onBounds,
-                        // onCameraMove: _onCameraMove,
+                  child: SizedBox(
+                    width: 400,
+                    height: 250,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: Obx(
+                        () => GoogleMap(
+                          mapType: mapTypenya.value
+                              ? MapType.normal
+                              : MapType.hybrid,
+                          mapToolbarEnabled: true,
+                          rotateGesturesEnabled: true,
+                          myLocationButtonEnabled: true,
+                          polygons: _polygons,
+                          markers: _markers,
+                          // liteModeEnabled: true,
+                          initialCameraPosition: _initialCameraPosition,
+                          onMapCreated: _onBounds,
+                          // onCameraMove: _onCameraMove,
+                        ),
                       ),
                     ),
                   ),
@@ -1856,7 +1869,10 @@ class KirimBarangController extends GetxController {
                         },
                         child: const Text('Lokasi Sekarang'),
                         style: ElevatedButton.styleFrom(
-                          primary: Colors.blue,
+                          primary: Color.fromARGB(255, 4, 103, 103),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                       ),
                       const SizedBox(
@@ -1873,7 +1889,7 @@ class KirimBarangController extends GetxController {
                                   _pilihanKelurahanDesa;
                             }
                             konfirmMarkerLokasiPermulaan = _markerPosition;
-                            WidgetsBinding.instance?.focusManager.primaryFocus
+                            WidgetsBinding.instance!.focusManager.primaryFocus
                                 ?.unfocus();
                             _check_jarak_tempuh();
                             Get.back();
@@ -1912,7 +1928,10 @@ class KirimBarangController extends GetxController {
                           primary: (_markerPosition == null &&
                                   konfirmMarkerLokasiPermulaan == null)
                               ? Colors.grey
-                              : Colors.blue,
+                              : Color.fromARGB(255, 104, 164, 164),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
                         ),
                       ),
                     ],

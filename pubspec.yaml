@@ -18,7 +18,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.16.0-134.5.beta <3.0.0"
+  # sdk: ">=2.16.0-134.5.beta <3.0.0"
+  sdk: ">=2.16.2 <3.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -58,6 +59,34 @@ dependencies:
   location: ^4.2.0
   flutter_polyline_points:
   url_launcher: ^6.0.1
+
+  flutter_local_notifications: ^9.5.3
+  rxdart: ^0.26.0
+  timezone: ^0.8.0
+  flutter_native_timezone: ^2.0.0
+
+  flutter_background_service: ^2.1.2
+  flutter_background_service_android: ^2.0.2
+  device_info_plus: ^3.2.4
+  
+  # flutter_background_service_platform_interface: ^0.0.1
+
+  # flutter_foreground_task: ^3.7.3 #ini jalan kalau pakai if true
+
+  # workmanager: ^0.4.1 # ini jalan
+  # background_fetch: ^1.1.0
+  # android_alarm_manager_plus: ^2.0.5
+
+  # collection: ^1.15.0
+  # worker_manager: ^4.2.6
+
+  # flutter_foreground_plugin: ^0.8.0 #ini jalan...tpi kalao close ndak jalan
+
+  # isolate_handler: ^1.0.1
+  # firebase_messaging: ^11.4.2
+  # firebase_core: ^1.18.0
+  # firebase_analytics: ^9.1.10
+
 
 dev_dependencies:
   flutter_test:

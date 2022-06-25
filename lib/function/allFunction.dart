@@ -67,6 +67,13 @@ class AllFunction {
     return numbernya.toString();
   }
 
+  static String thousandSeperatorDouble(double number) {
+    final formatter = NumberFormat('#,###');
+    final numbernya = formatter.format(number);
+    // log(numbernya + " ini numbernya");
+    return numbernya.toString();
+  }
+
   static removeComma(String number) {
     final numbernya = number.replaceAll(RegExp(r','), '');
     return numbernya;

@@ -35,11 +35,11 @@ class KirimBarangPage extends GetView<KirimBarangController> {
                           width: 80,
                           height: 80,
                           decoration: BoxDecoration(
-                            color: Colors.grey,
+                            color: const Color.fromARGB(255, 199, 214, 234),
                             borderRadius: BorderRadius.circular(100),
                             boxShadow: const [
                               BoxShadow(
-                                color: Colors.grey,
+                                color: Color.fromARGB(255, 104, 164, 164),
                                 blurRadius: 5,
                                 spreadRadius: 1,
                               ),
@@ -76,7 +76,8 @@ class KirimBarangPage extends GetView<KirimBarangController> {
                                         ),
                                       )
                                     : const Icon(Icons.add,
-                                        color: Colors.white, size: 22),
+                                        color: Color.fromARGB(255, 2, 72, 72),
+                                        size: 22),
                                 Positioned(
                                   bottom: 0,
                                   right: 0,
@@ -87,7 +88,8 @@ class KirimBarangPage extends GetView<KirimBarangController> {
                                       width: 40,
                                       height: 40,
                                       decoration: BoxDecoration(
-                                        color: Colors.blue,
+                                        color: const Color.fromARGB(
+                                            255, 4, 103, 103),
                                         borderRadius:
                                             BorderRadius.circular(100),
                                       ),
@@ -286,6 +288,12 @@ class KirimBarangPage extends GetView<KirimBarangController> {
                               // log("sini pin lokasi");
                               controller.pin_lokasi(context);
                             },
+                            style: ElevatedButton.styleFrom(
+                              primary: const Color.fromARGB(255, 104, 164, 164),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
                             child: const Text(
                               'Lokasi Pengiriman',
                               textAlign: TextAlign.center,
@@ -307,6 +315,12 @@ class KirimBarangPage extends GetView<KirimBarangController> {
                               // }
                               controller.pin_lokasi_permulaan(context, "awal");
                             },
+                            style: ElevatedButton.styleFrom(
+                              primary: const Color.fromARGB(255, 104, 164, 164),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
                             child: const Text(
                               'Lokasi Permulaan',
                               textAlign: TextAlign.center,
@@ -319,17 +333,20 @@ class KirimBarangPage extends GetView<KirimBarangController> {
                       child: SizedBox(
                         width: MediaQuery.of(context).size.width * 0.3,
                         child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.green,
-                          ),
                           onPressed: () {
-                            WidgetsBinding.instance?.focusManager.primaryFocus
+                            WidgetsBinding.instance!.focusManager.primaryFocus
                                 ?.unfocus();
                             if (controller.formKey.currentState!.validate()) {
                               FocusScope.of(context).unfocus();
                               controller.konfirmasi_all(context);
                             }
                           },
+                          style: ElevatedButton.styleFrom(
+                            primary: const Color.fromARGB(255, 2, 72, 72),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
                           child: const Text(
                             'Konfirmasi',
                             textAlign: TextAlign.center,

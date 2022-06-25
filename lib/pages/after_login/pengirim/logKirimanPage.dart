@@ -51,7 +51,7 @@ class LogKirimanPage extends GetView<LogKirimanController> {
                             child: GestureDetector(
                               child: const Icon(
                                 Icons.list_alt_rounded,
-                                color: Colors.blueAccent,
+                                color: Color.fromARGB(255, 4, 103, 103),
                               ),
                               onTap: () {},
                             ),

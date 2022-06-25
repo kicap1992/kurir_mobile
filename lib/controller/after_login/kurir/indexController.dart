@@ -4,9 +4,11 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kurir/controller/after_login/kurir/pengaturanController.dart';
 
 import 'package:socket_io_client/socket_io_client.dart';
+
+import 'pengaturanController.dart';
+import 'pengirimanController.dart';
 
 class KurirIndexController extends GetxController {
   late Socket socket;
@@ -22,6 +24,15 @@ class KurirIndexController extends GetxController {
       case 0:
         final ctrl = Get.put<PengaturanKurirController>(
           PengaturanKurirController(),
+        );
+        ctrl.onInit();
+
+        // Get.put(PengaturanKurirController());
+
+        break;
+      case 1:
+        final ctrl = Get.put<PengirimanKurirController>(
+          PengirimanKurirController(),
         );
         ctrl.onInit();
 
@@ -63,7 +74,8 @@ class KurirIndexController extends GetxController {
         ),
       ],
       currentIndex: _indexTap.value,
-      selectedItemColor: const Color.fromARGB(255, 148, 183, 229),
+      selectedItemColor: const Color.fromARGB(255, 2, 72, 72),
+      unselectedItemColor: const Color.fromARGB(255, 199, 214, 234),
       onTap: (index) => _onItemTapped(index, context),
     );
   }

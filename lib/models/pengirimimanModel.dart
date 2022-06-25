@@ -12,7 +12,7 @@ class PengirimanModel {
   String? alamatPenerima;
   String? statusPengiriman;
   KurirModel? kurir;
-  String? pengirim;
+  PengirimModel? pengirim;
   String? createdAt;
   String? updatedAt;
   int? iV;
@@ -48,7 +48,9 @@ class PengirimanModel {
     alamatPenerima = json['alamat_penerima'];
     statusPengiriman = json['status_pengiriman'];
     kurir = json['kurir'] != null ? KurirModel.fromJson(json['kurir']) : null;
-    pengirim = json['pengirim'];
+    pengirim = json['pengirim'] != null
+        ? PengirimModel.fromJson(json['pengirim'])
+        : null;
     createdAt = json['created_at'];
     updatedAt = json['updated_at'];
     iV = json['__v'];
@@ -74,7 +76,9 @@ class PengirimanModel {
     if (kurir != null) {
       data['kurir'] = kurir!.toJson();
     }
-    data['pengirim'] = pengirim;
+    if (pengirim != null) {
+      data['pengirim'] = pengirim!.toJson();
+    }
     data['created_at'] = createdAt;
     data['updated_at'] = updatedAt;
     data['__v'] = iV;

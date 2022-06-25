@@ -5,6 +5,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:kurir/controller/after_login/pengirim/kirimBarangController.dart';
+import 'package:kurir/controller/after_login/pengirim/listKurirController.dart';
 import 'package:kurir/controller/after_login/pengirim/logKirimanController.dart';
 
 class PengirimIndexController extends GetxController {
@@ -24,6 +25,12 @@ class PengirimIndexController extends GetxController {
     if (index == 1) {
       var _init = Get.put(LogKirimanController());
       _init.onInit();
+    }
+
+    if (index == 2) {
+      // Get.lazyPut<KirimBarangController>(() => KirimBarangController());
+      var _init = Get.put(ListKurirController());
+      _init.onReady();
     }
 
     _indexTap.value = index;
@@ -60,7 +67,7 @@ class PengirimIndexController extends GetxController {
         ),
       ],
       currentIndex: _indexTap.value,
-      selectedItemColor: const Color.fromARGB(255, 148, 183, 229),
+      selectedItemColor: const Color.fromARGB(255, 2, 72, 72),
       onTap: (index) => _onItemTapped(index, context),
     );
   }
@@ -68,7 +75,7 @@ class PengirimIndexController extends GetxController {
   _onItemTapped(int index, BuildContext context) {
     log("sini on item tapped");
     if (index == 3) {
-      Get.offAllNamed('/profilePengirim');
+      Get.offAndToNamed('/pengirimIndex/profilePengirim');
     }
 
     _indexTap.value = index;

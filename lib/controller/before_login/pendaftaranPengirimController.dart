@@ -79,6 +79,10 @@ class PendaftaranPengirimController extends GetxController {
                   onPressed: () {
                     Get.back();
                   },
+                  style: ElevatedButton.styleFrom(
+                    primary: const Color.fromARGB(255, 2, 72, 72),
+                    textStyle: const TextStyle(color: Colors.white),
+                  ),
                   child: const Text("OK"),
                 ),
                 const SizedBox(),
@@ -225,6 +229,9 @@ class PendaftaranPengirimController extends GetxController {
       actions: [
         ElevatedButton(
           child: const Text('Tidak'),
+          style: ElevatedButton.styleFrom(
+            primary: const Color.fromARGB(255, 2, 72, 72),
+          ),
           onPressed: () {
             Get.back();
           },
@@ -232,7 +239,7 @@ class PendaftaranPengirimController extends GetxController {
         ElevatedButton(
           child: const Text('Ya'),
           style: ElevatedButton.styleFrom(
-            primary: Colors.red,
+            primary: const Color.fromARGB(255, 104, 164, 164),
           ),
           onPressed: () {
             // log("sini sign up");
@@ -400,6 +407,9 @@ class PendaftaranPengirimController extends GetxController {
         actions: [
           ElevatedButton(
             child: const Text('Tidak'),
+            style: ElevatedButton.styleFrom(
+              primary: const Color.fromARGB(255, 104, 164, 164),
+            ),
             onPressed: () {
               Get.back();
             },
@@ -407,7 +417,7 @@ class PendaftaranPengirimController extends GetxController {
           ElevatedButton(
             child: const Text('Ya'),
             style: ElevatedButton.styleFrom(
-              primary: Colors.red,
+              primary: const Color.fromARGB(255, 2, 72, 72),
             ),
             onPressed: () async {
               // await _cek_and_delete();

@@ -2,11 +2,12 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kurir/widgets/focusToTextFormField.dart';
-import 'package:kurir/widgets/ourContainer.dart';
 
 import '../../controller/before_login/loginController.dart';
+import '../../widgets/appbar.dart';
 import '../../widgets/boxBackgroundDecoration.dart';
+import '../../widgets/focusToTextFormField.dart';
+import '../../widgets/ourContainer.dart';
 
 class LoginPage extends GetView<LoginController> {
   const LoginPage({Key? key}) : super(key: key);
@@ -16,8 +17,13 @@ class LoginPage extends GetView<LoginController> {
     return WillPopScope(
       onWillPop: () async => controller.willPopScopeWidget(),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Login'),
+        appBar: PreferredSize(
+          preferredSize:
+              Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
+          child: const AppBarWidget(
+            header: "Halaman Login",
+            autoLeading: true,
+          ),
         ),
         body: BoxBackgroundDecoration(
           child: SingleChildScrollView(
@@ -44,10 +50,38 @@ class LoginPage extends GetView<LoginController> {
                               () => DropdownButtonFormField(
                                 decoration: InputDecoration(
                                   labelText: 'Login Sebagai',
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
                                     borderSide: const BorderSide(
-                                      color: Colors.grey,
+                                      color: Color.fromARGB(255, 2, 72, 72),
+                                    ),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: const BorderSide(
+                                      color: Color.fromARGB(255, 2, 72, 72),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: const BorderSide(
+                                      color: Color.fromARGB(255, 104, 164, 164),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: const BorderSide(
+                                      color: Color.fromARGB(255, 2, 72, 72),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: const BorderSide(
+                                      color: Colors.red,
+                                      width: 1,
                                     ),
                                   ),
                                 ),
@@ -79,12 +113,41 @@ class LoginPage extends GetView<LoginController> {
                                 hintText: 'Masukkan Username',
                                 labelText: 'Username',
                                 border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                                  borderRadius: BorderRadius.circular(30),
                                   borderSide: const BorderSide(
-                                    color: Colors.grey,
+                                    color: Color.fromARGB(255, 2, 72, 72),
+                                  ),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: const BorderSide(
+                                    color: Color.fromARGB(255, 2, 72, 72),
+                                    width: 1,
+                                  ),
+                                ),
+                                disabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: const BorderSide(
+                                    color: Color.fromARGB(255, 104, 164, 164),
+                                    width: 1,
+                                  ),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: const BorderSide(
+                                    color: Color.fromARGB(255, 2, 72, 72),
+                                    width: 1,
+                                  ),
+                                ),
+                                errorBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(30),
+                                  borderSide: const BorderSide(
+                                    color: Colors.red,
+                                    width: 1,
                                   ),
                                 ),
                               ),
+
                               validator: (value) {
                                 if (value!.isEmpty) {
                                   controller.usernameFocusNode.requestFocus();
@@ -109,9 +172,37 @@ class LoginPage extends GetView<LoginController> {
                                   hintText: 'Masukkan Password',
                                   labelText: 'Password',
                                   border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                    borderRadius: BorderRadius.circular(30),
                                     borderSide: const BorderSide(
-                                      color: Colors.grey,
+                                      color: Color.fromARGB(255, 2, 72, 72),
+                                    ),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: const BorderSide(
+                                      color: Color.fromARGB(255, 2, 72, 72),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: const BorderSide(
+                                      color: Color.fromARGB(255, 104, 164, 164),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: const BorderSide(
+                                      color: Color.fromARGB(255, 2, 72, 72),
+                                      width: 1,
+                                    ),
+                                  ),
+                                  errorBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(30),
+                                    borderSide: const BorderSide(
+                                      color: Colors.red,
+                                      width: 1,
                                     ),
                                   ),
                                   suffixIcon: IconButton(
@@ -153,6 +244,12 @@ class LoginPage extends GetView<LoginController> {
                                   controller.login();
                                 }
                               },
+                              style: ElevatedButton.styleFrom(
+                                primary: const Color.fromARGB(255, 2, 72, 72),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
                               child: const Text('Login'),
                             ),
                           ),

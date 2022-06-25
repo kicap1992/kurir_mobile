@@ -1,8 +1,9 @@
-// ignore_for_file: file_names, non_constant_identifier_names
+// ignore_for_file: file_names, non_constant_identifier_names, sized_box_for_whitespace
 
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
@@ -22,13 +23,14 @@ class LogKirimanController extends GetxController {
   RxBool isPortrait = true.obs;
 
   late GoogleMapController mapController;
-  Set<Marker> _markers = {};
-  Set<Polyline> _polylines = {};
+  final Set<Marker> _markers = {};
+  final Set<Polyline> _polylines = {};
   List<LatLng> _polylineCoordinates = [];
-  PolylinePoints _polylinePoints = PolylinePoints();
-  String _googleAPiKey = globals.api_key;
+  final PolylinePoints _polylinePoints = PolylinePoints();
+  final String _googleAPiKey = globals.api_key;
 
   List<LatLng>? _listLatLng;
+  double? _distance_travel;
 
   // late GoogleMapController mapController;
   final _initialCameraPosition = const CameraPosition(
@@ -59,7 +61,7 @@ class LogKirimanController extends GetxController {
 
   checkAllLogKiriman() async {
     Map<String, dynamic> _data = await PengirimApi.getLogKiriman();
-    log(_data.toString());
+    // log(_data.toString());
     // await 4 sec
     widgetLogKiriman.value = const Center(
       child: CircularProgressIndicator(),
@@ -70,7 +72,7 @@ class LogKirimanController extends GetxController {
 
       for (var item in _data['data']) {
         PengirimanModel? _pengirimanModel = PengirimanModel.fromJson(item);
-        // log(_pengiriman.kurir!.id.toString());
+        log(_pengirimanModel.createdAt.toString());
         _listWidget.add(_widgetLogKiriman(_pengirimanModel));
 
         // _listWidget.add(_widgetLogKiriman());
@@ -102,8 +104,9 @@ class LogKirimanController extends GetxController {
     }
   }
 
-  _widgetLogKiriman(PengirimanModel? _pengirimanModel) {
-    var _createdAtPlus8 = DateTime.parse(_pengirimanModel!.createdAt!)
+  Widget _widgetLogKiriman(PengirimanModel _pengirimanModel) {
+    log(_pengirimanModel.kurir.toString());
+    var _createdAtPlus8 = DateTime.parse(_pengirimanModel.createdAt!)
         .add(const Duration(hours: 8));
 
     String _tanggal = DateFormat('dd-MM-yyyy').format(_createdAtPlus8);
@@ -112,6 +115,7 @@ class LogKirimanController extends GetxController {
     String _jam = DateFormat('HH:mm:ss').format(_createdAtPlus8);
 
     String _nama_kurir = _pengirimanModel.kurir!.nama!;
+    // String _nama_kurir = "Nama";
 
     String _status = _pengirimanModel.statusPengiriman!;
 
@@ -132,8 +136,15 @@ class LogKirimanController extends GetxController {
           children: [
             SlidableAction(
               flex: 2,
-              onPressed: (context) {},
-              backgroundColor: const Color.fromARGB(255, 70, 192, 232),
+              onPressed: (context) {
+                Get.offAndToNamed(
+                  '/pengirimIndex/infoPengiriman',
+                  arguments: {
+                    'pengiriman_model': _pengirimanModel,
+                  },
+                );
+              },
+              backgroundColor: const Color.fromARGB(255, 104, 164, 164),
               foregroundColor: Colors.white,
               icon: Icons.info_outline_rounded,
               label: 'Info',
@@ -143,7 +154,7 @@ class LogKirimanController extends GetxController {
               onPressed: (context) {
                 _lihat_foto_kiriman(context, _foto_pengiriman);
               },
-              backgroundColor: const Color.fromARGB(255, 71, 92, 250),
+              backgroundColor: const Color.fromARGB(255, 4, 103, 103),
               foregroundColor: Colors.white,
               icon: Icons.photo_rounded,
               label: 'Barang Kiriman',
@@ -159,7 +170,7 @@ class LogKirimanController extends GetxController {
                 _lihat_rute_pengiriman(
                     context, _kordinat_pengiriman, _kordinat_permulaan);
               },
-              backgroundColor: Color.fromARGB(255, 242, 78, 23),
+              backgroundColor: const Color.fromARGB(255, 2, 72, 72),
               foregroundColor: Colors.white,
               icon: Icons.maps_home_work_rounded,
               label: "Rute Pengiriman",
@@ -234,7 +245,7 @@ class LogKirimanController extends GetxController {
 
   _lihat_foto_kiriman(BuildContext context, String foto_pengiriman) {
     log(foto_pengiriman);
-    if (foto_pengiriman != null && foto_pengiriman != "") {
+    if (foto_pengiriman != "") {
       Get.dialog(
         AlertDialog(
           title: const Text("Foto Pengiriman"),
@@ -253,7 +264,7 @@ class LogKirimanController extends GetxController {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
               child: Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage('assets/loading.gif'),
                     fit: BoxFit.cover,
@@ -276,12 +287,12 @@ class LogKirimanController extends GetxController {
       Get.snackbar(
         "Info",
         "Foto Barang Pengiriman Masih Dalam Proses Upload",
-        icon: Icon(
+        icon: const Icon(
           Icons.info_outline_rounded,
           color: Colors.white,
         ),
-        backgroundColor: Color.fromARGB(255, 71, 203, 240),
-        duration: Duration(seconds: 3),
+        backgroundColor: const Color.fromARGB(255, 71, 203, 240),
+        duration: const Duration(seconds: 3),
         snackPosition: SnackPosition.TOP,
       );
     }
@@ -291,6 +302,10 @@ class LogKirimanController extends GetxController {
       BuildContext context,
       KordinatPengiriman kordinat_pengiriman,
       KordinatPermulaan kordinat_permulaan) async {
+    await EasyLoading.show(
+      status: 'Loading Peta...',
+      maskType: EasyLoadingMaskType.black,
+    );
     _markers.clear();
     _polylines.clear();
     _polylineCoordinates = [];
@@ -306,16 +321,16 @@ class LogKirimanController extends GetxController {
       double.parse(kordinat_permulaan.lat!),
       double.parse(kordinat_permulaan.lng!),
     );
-    _listLatLng = [
-      LatLng(
-        double.parse(kordinat_permulaan.lat!),
-        double.parse(kordinat_permulaan.lng!),
-      ),
-      LatLng(
-        double.parse(kordinat_pengiriman.lat!),
-        double.parse(kordinat_pengiriman.lng!),
-      ),
-    ];
+    // _listLatLng = [
+    //   LatLng(
+    //     double.parse(kordinat_permulaan.lat!),
+    //     double.parse(kordinat_permulaan.lng!),
+    //   ),
+    //   LatLng(
+    //     double.parse(kordinat_pengiriman.lat!),
+    //     double.parse(kordinat_pengiriman.lng!),
+    //   ),
+    // ];
 
     await setPolylines(
       _latLng_pengiriman,
@@ -327,7 +342,7 @@ class LogKirimanController extends GetxController {
         markerId: const MarkerId("permulaan"),
         position: LatLng(double.parse(kordinat_permulaan.lat!),
             double.parse(kordinat_permulaan.lng!)),
-        infoWindow: InfoWindow(
+        infoWindow: const InfoWindow(
           title: "Lokasi Permulaan",
         ),
       ),
@@ -338,19 +353,19 @@ class LogKirimanController extends GetxController {
         markerId: const MarkerId("pengiriman"),
         position: LatLng(double.parse(kordinat_pengiriman.lat!),
             double.parse(kordinat_pengiriman.lng!)),
-        infoWindow: InfoWindow(
+        infoWindow: const InfoWindow(
           title: "LokasiPengiriman",
         ),
       ),
     );
     // await 1 sec
-    await Future.delayed(Duration(seconds: 1));
+    // await Future.delayed(Duration(seconds: 1));
     Get.dialog(
       AlertDialog(
         content: Container(
           height: Get.height * 0.5,
           child: GoogleMap(
-            mapType: MapType.hybrid,
+            mapType: MapType.normal,
             mapToolbarEnabled: true,
             rotateGesturesEnabled: true,
             myLocationButtonEnabled: true,
@@ -362,8 +377,37 @@ class LogKirimanController extends GetxController {
             // onCameraMove: _onCameraMove,
           ),
         ),
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              const SizedBox(),
+              Container(
+                width: 200,
+                child: TextFormField(
+                  initialValue: _distance_travel.toString() + " km",
+                  decoration: InputDecoration(
+                    labelText: 'Jarak Pengiriman',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: const BorderSide(
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox()
+            ],
+          ),
+          const SizedBox(
+            height: 10,
+          ),
+        ],
       ),
     );
+
+    await EasyLoading.dismiss();
   }
 
   setPolylines(LatLng latLng_pengiriman, LatLng latLng_permulaan) async {
@@ -375,17 +419,21 @@ class LogKirimanController extends GetxController {
       travelMode: TravelMode.driving,
       // travelMode: TravelMode.driving,
     );
+
     // log(_result.points.toString() + "ini dia");
     if (_result.points.isNotEmpty) {
       // loop through all PointLatLng points and convert them
       // to a list of LatLng, required by the Polyline
-      _result.points.forEach((PointLatLng point) {
+      _listLatLng = [latLng_permulaan];
+      for (var point in _result.points) {
         _polylineCoordinates.add(LatLng(point.latitude, point.longitude));
-      });
+        _listLatLng!.add(LatLng(point.latitude, point.longitude));
+      }
+      _listLatLng!.add(latLng_pengiriman);
 
       Polyline polyline = Polyline(
-        polylineId: PolylineId("poly"),
-        color: Color.fromARGB(255, 40, 122, 198),
+        polylineId: const PolylineId("poly"),
+        color: const Color.fromARGB(255, 40, 122, 198),
         points: _polylineCoordinates,
         width: 3,
       );
@@ -399,6 +447,7 @@ class LogKirimanController extends GetxController {
       );
 
       log(distance.toString() + "ini dia");
+      _distance_travel = distance;
     }
   }
 

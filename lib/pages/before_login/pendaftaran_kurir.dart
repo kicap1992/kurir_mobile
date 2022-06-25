@@ -3,10 +3,11 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:kurir/controller/before_login/pendaftaranKurirController.dart';
-import 'package:kurir/widgets/focusToTextFormField.dart';
 
+import '../../controller/before_login/pendaftaranKurirController.dart';
+import '../../widgets/appbar.dart';
 import '../../widgets/boxBackgroundDecoration.dart';
+import '../../widgets/focusToTextFormField.dart';
 import '../../widgets/ourContainer.dart';
 
 // import 'package:image_picker/image_picker.dart';
@@ -20,17 +21,22 @@ class PendaftaranKurirPage extends GetView<PendaftaranKurirController> {
     return WillPopScope(
       onWillPop: () => controller.willPopScopeWidget(),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Pendaftaran Kurir'),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.info_outline),
-              onPressed: () {
-                controller.intro_message();
-                // controller.getHttp();
-              },
-            ),
-          ],
+        appBar: PreferredSize(
+          preferredSize:
+              Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
+          child: AppBarWidget(
+            header: "Pendaftaran Kurir",
+            autoLeading: true,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.info_outline),
+                onPressed: () {
+                  controller.intro_message();
+                  // controller.getHttp();
+                },
+              ),
+            ],
+          ),
         ),
         body: BoxBackgroundDecoration(
           child: SingleChildScrollView(
@@ -650,7 +656,17 @@ class PendaftaranKurirPage extends GetView<PendaftaranKurirController> {
                             );
                           }
                         },
-                        child: const Text('Daftar'),
+                        child: const Text(
+                          'Daftar',
+                          style:
+                              TextStyle(color: Color.fromARGB(255, 2, 72, 72)),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
                       ),
                     ),
                     SizedBox(

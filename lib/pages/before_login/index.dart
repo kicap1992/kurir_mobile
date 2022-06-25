@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:kurir/controller/before_login/loginController.dart';
 // import 'package:kurir/controller/before_login/indexController.dart';
 
+import '../../widgets/appbar.dart';
 import '../../widgets/boxBackgroundDecoration.dart';
 
 // class IndexPage extends GetView<IndexController> {
@@ -13,9 +14,13 @@ class IndexPage extends GetView<LoginController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Hompage'),
-        automaticallyImplyLeading: false,
+      appBar: PreferredSize(
+        preferredSize:
+            Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
+        child: const AppBarWidget(
+          header: "Halaman Utama",
+          autoLeading: true,
+        ),
       ),
       body: const DoubleBackToCloseApp(
         child: BoxBackgroundDecoration(

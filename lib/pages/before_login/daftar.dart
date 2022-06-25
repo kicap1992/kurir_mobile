@@ -2,9 +2,10 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kurir/controller/before_login/loginController.dart';
 // import 'package:kurir/controller/before_login/indexController.dart';
 
+import '../../controller/before_login/loginController.dart';
+import '../../widgets/appbar.dart';
 import '../../widgets/boxBackgroundDecoration.dart';
 import '../../widgets/ourContainer.dart';
 
@@ -17,8 +18,13 @@ class DaftarPage extends GetView<LoginController> {
     return WillPopScope(
       onWillPop: () async => controller.willPopScopeWidget(),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Daftar'),
+        appBar: PreferredSize(
+          preferredSize:
+              Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
+          child: const AppBarWidget(
+            header: "Halaman Pendaftaran",
+            autoLeading: true,
+          ),
         ),
         body: BoxBackgroundDecoration(
           child: SingleChildScrollView(
@@ -80,6 +86,12 @@ class DaftarPage extends GetView<LoginController> {
                                 Get.offAllNamed('/pendaftaranPengirim');
                               }
                             },
+                            style: ElevatedButton.styleFrom(
+                              primary: const Color.fromARGB(255, 2, 72, 72),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
                             child: const Text('Daftar'),
                           ),
                         ),
