@@ -97,4 +97,35 @@ class AllFunction {
         cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
     return 12742 * asin(sqrt(a));
   }
+
+
+  static String timeZoneAdd8(time) {
+    // add 8 hours to timezone
+    // createdAt.add(Duration(hours: 8));
+    // dev.log(createdAt.toString());
+    var _time = DateTime.parse(time).add(const Duration(hours: 8));
+    // dev.log(_time.toString());
+    // seperate date and time
+    var _date = _time.toString().split(" ")[0];
+    var _time2 = _time.toString().split(" ")[1];
+    // only take the hour and minute
+    _time2 = _time2.split(":")[0] + ":" + _time2.split(":")[1];
+    // if the hour is less than 10, add 0 before
+    if (_time2.split(":")[0].length == 1) {
+      _time2 = "0" + _time2;
+    }
+    // if the minute is less than 10, add 0 before
+    if (_time2.split(":")[1].length == 1) {
+      _time2 = _time2 + "0";
+    }
+    // if past 12:00, add "PM"
+    if (int.parse(_time2.split(":")[0]) >= 12) {
+      _time2 = _time2 + " PM";
+    } else {
+      _time2 = _time2 + " AM";
+    }
+
+    return _date + " | " + _time2;
+  }
+
 }

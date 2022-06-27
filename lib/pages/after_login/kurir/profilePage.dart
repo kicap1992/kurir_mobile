@@ -33,7 +33,7 @@ class ProfileKurirPage extends GetView<KurirProfileController> {
                       ElevatedButton(
                         child: const Text('Yes'),
                         style: ElevatedButton.styleFrom(
-                          primary: Color.fromARGB(
+                          primary: const Color.fromARGB(
                               255, 104, 164, 164), //background color
                           // onPrimary: Colors.black, //ripple color
                         ),
@@ -46,8 +46,8 @@ class ProfileKurirPage extends GetView<KurirProfileController> {
                       ElevatedButton(
                         child: const Text('No'),
                         style: ElevatedButton.styleFrom(
-                          primary:
-                              Color.fromARGB(255, 2, 72, 72), //background color
+                          primary: const Color.fromARGB(
+                              255, 2, 72, 72), //background color
                           // onPrimary: Colors.black, //ripple color
                         ),
                         onPressed: () {
@@ -69,8 +69,8 @@ class ProfileKurirPage extends GetView<KurirProfileController> {
           );
           return false;
         },
-        child: BoxBackgroundDecoration(
-          child: const Center(
+        child: const BoxBackgroundDecoration(
+          child: Center(
             child: Text('Profile'),
           ),
         ),

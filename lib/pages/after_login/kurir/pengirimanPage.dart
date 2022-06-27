@@ -1,9 +1,11 @@
 // ignore_for_file: file_names
+import 'dart:developer' as dev;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:kurir/function/allFunction.dart';
 
 import '../../../controller/after_login/kurir/pengirimanController.dart';
 import '../../../models/pengirimimanModel.dart';
@@ -66,8 +68,8 @@ class _MainWidget extends StatelessWidget {
                 _SlidableWidget(data: data, controller: controller),
             if (controller.loadPengiriman.value == 1 &&
                 controller.pengirimanModelList.isEmpty)
-              Center(
-                  child: const TiadaDataWIdget(
+              const Center(
+                  child: TiadaDataWIdget(
                       text: "Tiada data pengiriman\ndalam proses pengesahan")),
             if (controller.loadPengiriman.value == 2)
               const ErrorLoadDataWidget(),
@@ -90,6 +92,25 @@ class _SlidableWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    late String _text;
+    late IconData _icon;
+
+    switch (data.statusPengiriman) {
+      case "Dalam Pengesahan Kurir":
+        _text = "Terima Pengiriman";
+        _icon = Icons.check_box;
+        break;
+      case "Disahkan Kurir":
+        _text = "Mengambil Paket\nKiriman";
+        _icon = Icons.motorcycle_outlined;
+        break;
+      case "Mengambil Paket Pengiriman Dari Pengirim":
+        _text = "Paket Diterima\nDari Pengirim";
+        _icon = Icons.handshake_outlined;
+        break;
+      default:
+    }
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: Slidable(
@@ -102,22 +123,21 @@ class _SlidableWidget extends StatelessWidget {
             SlidableAction(
               flex: 5,
               onPressed: (context) {
-                // Get.offAndToNamed(
-                //   '/pengirimIndex/infoPengiriman',
-                //   arguments: {
-                //     'pengiriman_model': _pengirimanModel,
-                //   },
-                // );
+                if (data.statusPengiriman == "Dalam Pengesahan Kurir") {
+                  controller.terimaPengiriman(data.sId);
+                } else if (data.statusPengiriman == "Disahkan Kurir") {
+                  controller.mengambilPaket(data.sId);
+                }
               },
               backgroundColor: const Color.fromARGB(255, 104, 164, 164),
               foregroundColor: Colors.white,
-              icon: Icons.check_box,
-              label: 'Terima Pengiriman',
+              icon: _icon,
+              label: _text,
             ),
             SlidableAction(
               flex: 5,
               onPressed: (context) {
-                controller.lihat_foto_kiriman(context, data.fotoPengiriman!);
+                controller.lihatFotoKiriman(context, data.fotoPengiriman!);
               },
               backgroundColor: const Color.fromARGB(255, 4, 103, 103),
               foregroundColor: Colors.white,
@@ -128,18 +148,19 @@ class _SlidableWidget extends StatelessWidget {
         ),
         endActionPane: ActionPane(
           motion: const DrawerMotion(),
-          extentRatio: 0.5,
+          extentRatio:
+              (data.statusPengiriman == "Dalam Pengesahan Kurir") ? 0.5 : 0.01,
           children: [
-            SlidableAction(
-              onPressed: (context) {
-                // _lihat_rute_pengiriman(
-                //     context, _kordinat_pengiriman, _kordinat_permulaan);
-              },
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              icon: Icons.cancel_rounded,
-              label: "Batalkan Permintaan\nPengirim",
-            ),
+            if (data.statusPengiriman == 'Dalam Pengesahan Kurir')
+              SlidableAction(
+                onPressed: (context) {
+                  controller.batalkanPengiriman(data.sId);
+                },
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+                icon: Icons.cancel_rounded,
+                label: "Batalkan Permintaan\nPengirim",
+              ),
           ],
         ),
         child: _MainChild(data: data, controller: controller),
@@ -162,7 +183,7 @@ class _MainChild extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      height: 115,
+      height: 132,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -200,13 +221,32 @@ class _MainChild extends StatelessWidget {
                   fit: BoxFit.fitHeight,
                 ),
               ),
-              child: CircleAvatar(
-                radius: 30.0,
-                backgroundImage: NetworkImage(
-                  data.pengirim!.photoUrl ?? 'https://via.placeholder.com/150',
-                  scale: 0.5,
+              child: Center(
+                child: CircleAvatar(
+                  radius: 30.0,
+                  // backgroundImage: NetworkImage(
+                  //   data.pengirim!.photoUrl ?? 'https://via.placeholder.com/150',
+                  //   scale: 0.5,
+                  // ),
+                  backgroundColor: Colors.transparent,
+                  child: ClipOval(
+                    child: Image.network(
+                      data.pengirim!.photoUrl ??
+                          'https://via.placeholder.com/150',
+                      fit: BoxFit.cover,
+                      width: 100,
+                      height: 100,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Center(
+                          child: Icon(
+                            Icons.error,
+                            size: 20,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
-                backgroundColor: Colors.transparent,
               ),
             ),
           ),
@@ -214,70 +254,125 @@ class _MainChild extends StatelessWidget {
             flex: 4,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const SizedBox(height: 10),
-                Text(
-                  controller.timeZoneAdd8(data.createdAt),
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    overflow: TextOverflow.ellipsis,
+                FittedBox(
+                  child: Text(
+                    AllFunction.timeZoneAdd8(data.createdAt),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
-                Text(
-                  data.pengirim!.nama!,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    color: Colors.grey,
-                    overflow: TextOverflow.ellipsis,
+                FittedBox(
+                  child: Text(
+                    data.pengirim!.nama!,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: Colors.grey,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
                 // Coba(data:data,controller:controller)
-                _FutureBuilderHargaJarak(
-                  controller: controller,
-                  data: data,
+                FittedBox(
+                  child: _FutureBuilderHargaJarak(
+                    controller: controller,
+                    data: data,
+                  ),
                 ),
-                Text(
-                  data.statusPengiriman!,
-                  style: const TextStyle(
-                    fontSize: 15,
-                    color: Colors.grey,
-                    overflow: TextOverflow.ellipsis,
+                FittedBox(
+                  child: Text(
+                    data.statusPengiriman!,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      color: Colors.grey,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
           Expanded(
-            flex: 1,
-            child: Container(
-              padding: const EdgeInsets.all(2),
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 2, 72, 72),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: const Color.fromARGB(255, 104, 164, 164)
-                        .withOpacity(0.5),
-                    blurRadius: 10,
-                    spreadRadius: 5,
+            flex: 2,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              // crossAxisAlignment: CrossAxisAlignment.end,
+
+              children: [
+                _IconContainer(
+                  icon: const Icon(
+                    Icons.turn_sharp_right_outlined,
+                    color: Color.fromARGB(255, 199, 214, 234),
                   ),
-                ],
-              ),
-              child: IconButton(
-                onPressed: () {
-                  controller.showMapDialog(context, data);
-                },
-                icon: Icon(
-                  Icons.turn_sharp_right_outlined,
-                  color: Color.fromARGB(255, 199, 214, 234),
+                  color: const Color.fromARGB(255, 2, 72, 72),
+                  shadowColor: const Color.fromARGB(255, 104, 164, 164),
+                  onPressed: () {
+                    controller.showMapDialog(context, data);
+                    // dev.log("ini ditekan");
+                  },
                 ),
-              ),
+                if (data.statusPengiriman != "Dalam Pengesahan Kurir")
+                  _IconContainer(
+                    icon: const Icon(
+                      Icons.info_outlined,
+                      color: Colors.white,
+                    ),
+                    color: const Color.fromARGB(255, 104, 164, 164),
+                    shadowColor: const Color.fromARGB(255, 199, 214, 234),
+                    onPressed: () {
+                      // controller.showMapDialog(context, data);
+                      Get.toNamed('/kurirIndex/progressPenghantaran',
+                          arguments: data.sId);
+                      dev.log("ini ditekan");
+                    },
+                  ),
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _IconContainer extends StatelessWidget {
+  const _IconContainer({
+    Key? key,
+    required this.icon,
+    required this.color,
+    required this.shadowColor,
+    required this.onPressed,
+  }) : super(key: key);
+
+  final Icon icon;
+  final Color color;
+  final Color shadowColor;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(2),
+      width: 50,
+      height: 50,
+      decoration: BoxDecoration(
+        color: color,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: shadowColor.withOpacity(0.5),
+            blurRadius: 10,
+            spreadRadius: 5,
+          ),
+        ],
+      ),
+      child: IconButton(
+        onPressed: onPressed,
+        icon: icon,
       ),
     );
   }
@@ -390,16 +485,16 @@ class _FutureBuilderHargaJarak extends StatelessWidget {
             ],
           );
         } else if (snapshot.hasError) {
-          return Text(
+          return const Text(
             "Error mengambil data",
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               color: Colors.grey,
               overflow: TextOverflow.ellipsis,
             ),
           );
         } else {
-          return Center(
+          return const Center(
             child: CircularProgressIndicator(
               valueColor: AlwaysStoppedAnimation<Color>(
                 Color.fromARGB(

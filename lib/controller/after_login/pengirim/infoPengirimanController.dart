@@ -231,10 +231,26 @@ class InfoPengirimanController extends GetxController {
                     backgroundColor: Colors.white,
                     child: CircleAvatar(
                       radius: 50.0,
-                      backgroundImage: NetworkImage(
-                          pengirimanModel.kurir!.photo_url ??
-                              'https://via.placeholder.com/150'),
+                      // backgroundImage: NetworkImage(
+                      //     pengirimanModel.kurir!.photo_url ??
+                      //         'https://via.placeholder.com/150'),
                       backgroundColor: Colors.transparent,
+                      child: ClipOval(
+                        child: Image.network(
+                          pengirimanModel.kurir!.photo_url ??
+                              'https://via.placeholder.com/150',
+                          fit: BoxFit.cover,
+                          width: 100,
+                          height: 100,
+                          errorBuilder: (context, url, error) {
+                            return const Center(
+                                child: Icon(
+                              Icons.error,
+                              size: 20,
+                            ));
+                          },
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -265,6 +281,13 @@ class InfoPengirimanController extends GetxController {
                         pengirimanModel.kurir!.kenderaan_url ??
                             "https://via.placeholder.com/150",
                         fit: BoxFit.cover,
+                        errorBuilder: (context, url, error) {
+                          return const Center(
+                              child: Icon(
+                            Icons.error,
+                            size: 20,
+                          ));
+                        },
                       ),
                     ),
                   ),
@@ -357,16 +380,27 @@ class InfoPengirimanController extends GetxController {
               fit: BoxFit.cover,
             ),
           ),
-          child: Container(
-            decoration: BoxDecoration(
-              // borderRadius: BorderRadius.circular(100),
-              image: DecorationImage(
-                image: NetworkImage(pengirimanModel.fotoPengiriman ??
-                    "https://via.placeholder.com/150"),
-                fit: BoxFit.fill,
-              ),
-            ),
+          child: Image.network(
+            pengirimanModel.fotoPengiriman ?? "https://via.placeholder.com/150",
+            fit: BoxFit.cover,
+            errorBuilder: (context, url, error) {
+              return const Center(
+                  child: Icon(
+                Icons.error,
+                size: 20,
+              ));
+            },
           ),
+          // child: Container(
+          //   decoration: BoxDecoration(
+          //     // borderRadius: BorderRadius.circular(100),
+          //     image: DecorationImage(
+          //       image: NetworkImage(pengirimanModel.fotoPengiriman ??
+          //           "https://via.placeholder.com/150"),
+          //       fit: BoxFit.fill,
+          //     ),
+          //   ),
+          // ),
         ),
       ),
     );

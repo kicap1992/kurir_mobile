@@ -119,7 +119,7 @@ class LogKirimanController extends GetxController {
 
     String _status = _pengirimanModel.statusPengiriman!;
 
-    String _foto_pengiriman = _pengirimanModel.fotoPengiriman!;
+    String _foto_pengiriman = _pengirimanModel.fotoPengiriman ?? '';
     // log(_foto_pengiriman + " foto pengiriman");
 
     var _kordinat_pengiriman = _pengirimanModel.kordinatPengiriman!;
@@ -270,14 +270,26 @@ class LogKirimanController extends GetxController {
                     fit: BoxFit.cover,
                   ),
                 ),
-                child: Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(foto_pengiriman),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
+                child: Image.network(
+                  foto_pengiriman,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Center(
+                      child: Icon(
+                        Icons.error,
+                        size: 20,
+                      ),
+                    );
+                  },
                 ),
+                // child: Container(
+                //   decoration: BoxDecoration(
+                //     image: DecorationImage(
+                //       image: NetworkImage(foto_pengiriman),
+                //       fit: BoxFit.cover,
+                //     ),
+                //   ),
+                // ),
               ),
             ),
           ),

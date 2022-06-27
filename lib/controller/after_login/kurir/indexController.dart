@@ -84,7 +84,7 @@ class KurirIndexController extends GetxController {
     log("sini on item tapped");
     _indexTap.value = index;
     if (index == 3) {
-      Get.offAllNamed('/profileKurir');
+      Get.offAllNamed('/kurirIndex/profileKurir');
     }
     FocusScope.of(context).unfocus();
     // Get.delete<PengaturanKurirController>();

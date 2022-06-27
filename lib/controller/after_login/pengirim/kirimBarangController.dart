@@ -768,9 +768,30 @@ class KirimBarangController extends GetxController {
                     backgroundColor: Colors.white,
                     child: CircleAvatar(
                       radius: 40.0,
-                      backgroundImage: NetworkImage(kurirModel.photo_url ??
-                          'https://via.placeholder.com/150'),
+                      // backgroundImage: NetworkImage(
+                      //   kurirModel.photo_url ??
+                      //       'https://via.placeholder.com/150',
+
+                      // ),
                       backgroundColor: Colors.transparent,
+                      child: ClipOval(
+                        child: Image.network(
+                          kurirModel.photo_url ??
+                              'https://via.placeholder.com/150',
+                          fit: BoxFit.cover,
+                          width: 100,
+                          height: 100,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Center(
+                              child: const Icon(
+                                Icons.error,
+                                color: Colors.grey,
+                                size: 20,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -1184,9 +1205,26 @@ class KirimBarangController extends GetxController {
                   backgroundColor: Colors.white,
                   child: CircleAvatar(
                     radius: 50.0,
-                    backgroundImage: NetworkImage(kurirModel.photo_url ??
-                        'https://via.placeholder.com/150'),
+                    // backgroundImage: NetworkImage(kurirModel.photo_url ??
+                    //     'https://via.placeholder.com/150'),
                     backgroundColor: Colors.transparent,
+                    child: ClipOval(
+                      child: Image.network(
+                        kurirModel.photo_url ??
+                            'https://via.placeholder.com/150',
+                        fit: BoxFit.cover,
+                        width: 100,
+                        height: 100,
+                        errorBuilder: (context, url, error) {
+                          return Center(
+                            child: const Icon(
+                              Icons.error,
+                              size: 20,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -1216,6 +1254,15 @@ class KirimBarangController extends GetxController {
                     child: Image.network(
                       kurirModel.kenderaan_url.toString(),
                       fit: BoxFit.cover,
+                      width: 100,
+                      errorBuilder: (context, url, error) {
+                        return Center(
+                          child: const Icon(
+                            Icons.error,
+                            size: 20,
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ),
@@ -1342,9 +1389,25 @@ class KirimBarangController extends GetxController {
                 backgroundColor: Colors.white,
                 child: CircleAvatar(
                   radius: 50.0,
-                  backgroundImage: NetworkImage(kurirModel.photo_url ??
-                      'https://via.placeholder.com/150'),
+                  // backgroundImage: NetworkImage(kurirModel.photo_url ??
+                  //     'https://via.placeholder.com/150'),
                   backgroundColor: Colors.transparent,
+                  child: ClipOval(
+                    child: Image.network(
+                      kurirModel.photo_url ?? 'https://via.placeholder.com/150',
+                      fit: BoxFit.cover,
+                      width: 100,
+                      height: 100,
+                      errorBuilder: (context, url, error) {
+                        return Center(
+                          child: const Icon(
+                            Icons.error,
+                            size: 20,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
                 ),
               ),
             ),

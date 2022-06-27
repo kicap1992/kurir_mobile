@@ -1,26 +1,27 @@
 import 'package:flutter/animation.dart';
 import 'package:get/get.dart';
-import 'package:kurir/binding/beforeEnterBinding.dart';
-import 'package:kurir/binding/infoPengirimanBinding.dart';
-import 'package:kurir/binding/kurirIndexBinding.dart';
-import 'package:kurir/binding/kurirProfileBinding.dart';
-// import 'package:kurir/binding/indexBinding.dart';
-import 'package:kurir/binding/pendaftaranKurirBinding.dart';
-import 'package:kurir/binding/pengirimIndexBinding.dart';
-import 'package:kurir/binding/pengirimProfileBinding.dart';
-import 'package:kurir/pages/after_login/before_enter.dart';
-import 'package:kurir/pages/after_login/kurir/profilePage.dart';
-import 'package:kurir/pages/after_login/pengirim/infoPengirimanPage.dart';
-import 'package:kurir/pages/after_login/pengirim/pengirimProfilePage.dart';
-import 'package:kurir/pages/before_login/daftar.dart';
-import 'package:kurir/pages/before_login/login.dart';
 
+import '../binding/beforeEnterBinding.dart';
+import '../binding/infoPengirimanBinding.dart';
+import '../binding/kurirIndexBinding.dart';
+import '../binding/kurirProfileBinding.dart';
 import '../binding/loginBinding.dart';
+import '../binding/pendaftaranKurirBinding.dart';
 import '../binding/pendaftaranPengirim.dart';
+import '../binding/pengirimIndexBinding.dart';
+import '../binding/pengirimProfileBinding.dart';
+import '../binding/progressPenghantaranKurirBinding.dart';
 import '../binding/splashBinding.dart';
+import '../pages/after_login/before_enter.dart';
 import '../pages/after_login/kurir/indexPage.dart';
+import '../pages/after_login/kurir/profilePage.dart';
+import '../pages/after_login/kurir/progressPenghantaranPage.dart';
 import '../pages/after_login/pengirim/indexPage.dart';
+import '../pages/after_login/pengirim/infoPengirimanPage.dart';
+import '../pages/after_login/pengirim/pengirimProfilePage.dart';
+import '../pages/before_login/daftar.dart';
 import '../pages/before_login/index.dart';
+import '../pages/before_login/login.dart';
 import '../pages/before_login/pendaftaran_kurir.dart';
 import '../pages/before_login/pendaftaran_pengirirm.dart';
 import '../splashScreen.dart';
@@ -93,14 +94,24 @@ class Routes {
         transition: Transition.native,
         transitionDuration: const Duration(seconds: 1),
         curve: Curves.easeInOut,
-      ),
-      GetPage(
-        name: '/profileKurir',
-        page: () => const ProfileKurirPage(),
-        binding: KurirProfileBinding(),
-        transition: Transition.native,
-        transitionDuration: const Duration(seconds: 1),
-        curve: Curves.easeInOut,
+        children: [
+          GetPage(
+            name: '/progressPenghantaran',
+            page: () => const ProgressPenghantaranPage(),
+            binding: ProgressPenghantaranKurirBinding(),
+            transition: Transition.native,
+            transitionDuration: const Duration(seconds: 1),
+            curve: Curves.easeInOut,
+          ),
+          GetPage(
+            name: '/profileKurir',
+            page: () => const ProfileKurirPage(),
+            binding: KurirProfileBinding(),
+            transition: Transition.native,
+            transitionDuration: const Duration(seconds: 1),
+            curve: Curves.easeInOut,
+          ),
+        ],
       ),
       GetPage(
         name: '/pengirimIndex',

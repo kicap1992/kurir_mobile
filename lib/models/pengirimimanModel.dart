@@ -17,22 +17,25 @@ class PengirimanModel {
   String? updatedAt;
   int? iV;
   String? fotoPengiriman;
+  List<History>? history;
 
-  PengirimanModel(
-      {this.kordinatPengiriman,
-      this.kordinatPermulaan,
-      this.biaya,
-      this.sId,
-      this.namaPenerima,
-      this.noTelponPenerima,
-      this.alamatPenerima,
-      this.statusPengiriman,
-      this.kurir,
-      this.pengirim,
-      this.createdAt,
-      this.updatedAt,
-      this.iV,
-      this.fotoPengiriman});
+  PengirimanModel({
+    this.kordinatPengiriman,
+    this.kordinatPermulaan,
+    this.biaya,
+    this.sId,
+    this.namaPenerima,
+    this.noTelponPenerima,
+    this.alamatPenerima,
+    this.statusPengiriman,
+    this.kurir,
+    this.pengirim,
+    this.createdAt,
+    this.updatedAt,
+    this.iV,
+    this.fotoPengiriman,
+    this.history,
+  });
 
   PengirimanModel.fromJson(Map<String, dynamic> json) {
     kordinatPengiriman = json['kordinat_pengiriman'] != null
@@ -55,6 +58,12 @@ class PengirimanModel {
     updatedAt = json['updated_at'];
     iV = json['__v'];
     fotoPengiriman = json['foto_pengiriman'];
+    if (json['history'] != null) {
+      history = <History>[];
+      json['history'].forEach((v) {
+        history!.add(History.fromJson(v));
+      });
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -83,6 +92,9 @@ class PengirimanModel {
     data['updated_at'] = updatedAt;
     data['__v'] = iV;
     data['foto_pengiriman'] = fotoPengiriman;
+    if (history != null) {
+      data['history'] = history!.map((v) => v.toJson()).toList();
+    }
     return data;
   }
 }
@@ -146,6 +158,25 @@ class Biaya {
     data['biaya_minimal'] = biayaMinimal;
     data['biaya_maksimal'] = biayaMaksimal;
     data['biaya_per_kilo'] = biayaPerKilo;
+    return data;
+  }
+}
+
+class History {
+  String? statusPengiriman;
+  String? waktu;
+
+  History({this.statusPengiriman, this.waktu});
+
+  History.fromJson(Map<String, dynamic> json) {
+    statusPengiriman = json['status_pengiriman'];
+    waktu = json['waktu'];
+  }
+
+  Map<String, dynamic> toJson() {
+    final Map<String, dynamic> data = <String, dynamic>{};
+    data['status_pengiriman'] = statusPengiriman;
+    data['waktu'] = waktu;
     return data;
   }
 }

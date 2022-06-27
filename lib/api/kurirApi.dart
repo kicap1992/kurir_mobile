@@ -15,6 +15,12 @@ import '../globals.dart' as globals;
 class KurirApi {
   static var client = http.Client();
 
+  static var storage = GetStorage();
+
+  static var username = storage.read("username");
+  static var password = storage.read("password");
+  static var id = storage.read("id");
+
   static clientClose(http.Client client) {
     client.close();
   }
@@ -28,10 +34,6 @@ class KurirApi {
     bool _cek_jaringan = await cek_jaringan(client);
 
     log("cek jaringan : " + _cek_jaringan.toString());
-    var storage = GetStorage();
-    var username = storage.read("username");
-    var password = storage.read("password");
-    var id = storage.read("id");
 
     if (!_cek_jaringan) {
       result = {
@@ -88,10 +90,6 @@ class KurirApi {
     bool _cek_jaringan = await cek_jaringan(client);
 
     log("cek jaringan : " + _cek_jaringan.toString());
-    var storage = GetStorage();
-    var username = storage.read("username");
-    var password = storage.read("password");
-    var id = storage.read("id");
 
     if (!_cek_jaringan) {
       result = {
@@ -152,10 +150,6 @@ class KurirApi {
     bool _cek_jaringan = await cek_jaringan(client);
 
     log("cek jaringan : " + _cek_jaringan.toString());
-    var storage = GetStorage();
-    var username = storage.read("username");
-    var password = storage.read("password");
-    var id = storage.read("id");
     if (!_cek_jaringan) {
       result = {
         'status': 500,
@@ -191,6 +185,180 @@ class KurirApi {
           result = {
             'status': 500,
             'message': "Gagal mengatur biaya pengiriman",
+            'data': data
+          };
+        }
+      } catch (e) {
+        result = {
+          'status': 500,
+          'message':
+              "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
+        };
+      }
+    }
+
+    return result;
+  }
+
+  // terima pengiriman kurir dan ubah status ke 'Pengiriman Disahkan kurir'
+  static Future<Map<String, dynamic>> sahkanPengiriman(
+      String? idPengiriman) async {
+    client = http.Client();
+    late Map<String, dynamic> result;
+    bool _cek_jaringan = await cek_jaringan(client);
+
+    // log("cek jaringan : " + _cek_jaringan.toString());
+
+    if (!_cek_jaringan) {
+      result = {
+        'status': 500,
+        'message':
+            "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
+      };
+    } else {
+      // wait for 3 sec
+      // await Future.delayed(Duration(seconds: 3));
+      // result = {'status': 200, 'message': "sini dia"};
+
+      try {
+        var response = await client.post(
+            Uri.parse(
+                "${globals.http_to_server}api/kurir/sahkan_pengiriman?username=$username&password=$password&id=$id"),
+            headers: {
+              "Accept": "application/json",
+              // "authorization":
+              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+              "crossDomain": "true"
+            },
+            body: {
+              "id_pengiriman": idPengiriman
+            }).timeout(const Duration(seconds: 60));
+        final data = jsonDecode(response.body);
+        // log(data.toString());
+        // log("ini status : " + response.statusCode.toString());
+        if (response.statusCode == 200) {
+          result = {
+            'status': 200,
+            'message': data['message'],
+            'data': data['data']
+          };
+        } else {
+          result = {
+            'status': response.statusCode,
+            'message': data['message'],
+            'data': data
+          };
+        }
+      } catch (e) {
+        result = {
+          'status': 500,
+          'message':
+              "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
+        };
+      }
+    }
+
+    return result;
+  }
+
+  static Future<Map<String, dynamic>> detailPengiriman(
+      String idPengiriman) async {
+    client = http.Client();
+    late Map<String, dynamic> result;
+    bool _cek_jaringan = await cek_jaringan(client);
+    if (!_cek_jaringan) {
+      result = {
+        'status': 500,
+        'message':
+            "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
+      };
+    } else {
+      // wait for 3 sec
+      // await Future.delayed(Duration(seconds: 3));
+      // result = {'status': 200, 'message': "sini dia"};
+      try {
+        var response = await client.get(
+            Uri.parse(
+                "${globals.http_to_server}api/kurir/detail_pengiriman?username=$username&password=$password&id=$id&id_pengiriman=$idPengiriman"),
+            headers: {
+              "Accept": "application/json",
+              // "authorization":
+              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+              "crossDomain": "true"
+            }).timeout(const Duration(seconds: 60));
+        final data = jsonDecode(response.body);
+        // log(data.toString());
+        // log("ini status : " + response.statusCode.toString());
+        if (response.statusCode == 200) {
+          result = {
+            'status': 200,
+            'message': data['message'],
+            'data': data['data']
+          };
+        } else {
+          result = {
+            'status': response.statusCode,
+            'message': data['message'],
+            'data': data
+          };
+        }
+      } catch (e) {
+        result = {
+          'status': 500,
+          'message':
+              "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
+        };
+      }
+    }
+
+    return result;
+  }
+
+  static Future<Map<String, dynamic>> mengambilPaketPengiriman(
+      String? idPengiriman) async {
+    client = http.Client();
+    late Map<String, dynamic> result;
+    bool _cek_jaringan = await cek_jaringan(client);
+
+    // log("cek jaringan : " + _cek_jaringan.toString());
+
+    if (!_cek_jaringan) {
+      result = {
+        'status': 500,
+        'message':
+            "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
+      };
+    } else {
+      // wait for 3 sec
+      // await Future.delayed(Duration(seconds: 3));
+      // result = {'status': 200, 'message': "sini dia"};
+
+      try {
+        var response = await client.post(
+            Uri.parse(
+                "${globals.http_to_server}api/kurir/mengambil_paket_pengiriman?username=$username&password=$password&id=$id"),
+            headers: {
+              "Accept": "application/json",
+              // "authorization":
+              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+              "crossDomain": "true"
+            },
+            body: {
+              "id_pengiriman": idPengiriman
+            }).timeout(const Duration(seconds: 60));
+        final data = jsonDecode(response.body);
+        // log(data.toString());
+        // log("ini status : " + response.statusCode.toString());
+        if (response.statusCode == 200) {
+          result = {
+            'status': 200,
+            'message': data['message'],
+            'data': data['data']
+          };
+        } else {
+          result = {
+            'status': response.statusCode,
+            'message': data['message'],
             'data': data
           };
         }

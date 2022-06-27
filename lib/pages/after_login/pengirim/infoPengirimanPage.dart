@@ -83,17 +83,21 @@ class InfoPengirimanPage extends GetView<InfoPengirimanController> {
                                 fit: BoxFit.fill,
                               ),
                             ),
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(100),
-                                image: DecorationImage(
-                                  image: NetworkImage(
-                                    controller.pengirimanModel.fotoPengiriman!,
-                                  ),
-                                  fit: BoxFit.fill,
-                                ),
-                              ),
-                            ),
+                            child: (controller.pengirimanModel.fotoPengiriman !=
+                                    null)
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(100),
+                                      image: DecorationImage(
+                                        image: NetworkImage(
+                                          controller
+                                              .pengirimanModel.fotoPengiriman!,
+                                        ),
+                                        fit: BoxFit.fill,
+                                      ),
+                                    ),
+                                  )
+                                : const SizedBox(),
                           ),
                         ),
                       ),

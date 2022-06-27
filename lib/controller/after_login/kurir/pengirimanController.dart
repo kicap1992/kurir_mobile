@@ -37,8 +37,16 @@ class PengirimanKurirController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    dev.log("sini on ready pengiriman");
     pengirimanAll();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    mapController.dispose();
+    _polylineCoordinates.clear();
+    markers.clear();
+    polylines.clear();
   }
 
   pengirimanAll() async {
@@ -61,35 +69,6 @@ class PengirimanKurirController extends GetxController {
     }
   }
 
-  String timeZoneAdd8(time) {
-    // add 8 hours to timezone
-    // createdAt.add(Duration(hours: 8));
-    // dev.log(createdAt.toString());
-    var _time = DateTime.parse(time).add(const Duration(hours: 8));
-    // dev.log(_time.toString());
-    // seperate date and time
-    var _date = _time.toString().split(" ")[0];
-    var _time2 = _time.toString().split(" ")[1];
-    // only take the hour and minute
-    _time2 = _time2.split(":")[0] + ":" + _time2.split(":")[1];
-    // if the hour is less than 10, add 0 before
-    if (_time2.split(":")[0].length == 1) {
-      _time2 = "0" + _time2;
-    }
-    // if the minute is less than 10, add 0 before
-    if (_time2.split(":")[1].length == 1) {
-      _time2 = _time2 + "0";
-    }
-    // if past 12:00, add "PM"
-    if (int.parse(_time2.split(":")[0]) >= 12) {
-      _time2 = _time2 + " PM";
-    } else {
-      _time2 = _time2 + " AM";
-    }
-
-    return _date + " | " + _time2;
-  }
-
   String cekHarga(
       double distance, int biayaMinimal, int biayaMaksimal, int biayaPerKilo) {
     //
@@ -104,30 +83,16 @@ class PengirimanKurirController extends GetxController {
   }
 
   cekDistance(LatLng latLngPengiriman, LatLng latLngPermulaan) async {
-    dev.log("sini dia berlaku");
-    PolylineResult _result = await _polylinePoints.getRouteBetweenCoordinates(
-      _googleAPiKey,
-      PointLatLng(latLngPermulaan.latitude, latLngPermulaan.longitude),
-      PointLatLng(latLngPengiriman.latitude, latLngPengiriman.longitude),
-      travelMode: TravelMode.driving,
-      // travelMode: TravelMode.driving,
+    double distance = await PengirimApi.jarak_route(
+      latLngPermulaan.latitude,
+      latLngPermulaan.longitude,
+      latLngPengiriman.latitude,
+      latLngPengiriman.longitude,
     );
 
-    // log(_result.points.toString() + "ini dia");
-    if (_result.points.isNotEmpty) {
-      double distance = await PengirimApi.jarak_route(
-        latLngPermulaan.latitude,
-        latLngPermulaan.longitude,
-        latLngPengiriman.latitude,
-        latLngPengiriman.longitude,
-      );
+    dev.log(distance.toString() + "ini dia");
 
-      dev.log(distance.toString() + "ini dia");
-
-      return distance;
-    } else {
-      return 0;
-    }
+    return distance;
   }
 
   void showMapDialog(BuildContext context, PengirimanModel data) async {
@@ -141,19 +106,19 @@ class PengirimanKurirController extends GetxController {
     _listLatLng = null;
     // _polylinePoints.clear();
 
-    LatLng _latLng_pengiriman = LatLng(
+    LatLng latLngPengiriman = LatLng(
       double.parse(data.kordinatPengiriman!.lat!),
       double.parse(data.kordinatPengiriman!.lng!),
     );
 
-    LatLng _latLng_permulaan = LatLng(
+    LatLng latLngPermulaan = LatLng(
       double.parse(data.kordinatPermulaan!.lat!),
       double.parse(data.kordinatPermulaan!.lng!),
     );
 
     await setPolylines(
-      _latLng_pengiriman,
-      _latLng_permulaan,
+      latLngPengiriman,
+      latLngPermulaan,
     );
 
     markers.add(
@@ -191,11 +156,11 @@ class PengirimanKurirController extends GetxController {
     await EasyLoading.dismiss();
   }
 
-  setPolylines(LatLng latLng_pengiriman, LatLng latLng_permulaan) async {
+  setPolylines(LatLng latLngPengiriman, LatLng latLngPermulaan) async {
     PolylineResult _result = await _polylinePoints.getRouteBetweenCoordinates(
       _googleAPiKey,
-      PointLatLng(latLng_permulaan.latitude, latLng_permulaan.longitude),
-      PointLatLng(latLng_pengiriman.latitude, latLng_pengiriman.longitude),
+      PointLatLng(latLngPermulaan.latitude, latLngPermulaan.longitude),
+      PointLatLng(latLngPengiriman.latitude, latLngPengiriman.longitude),
       travelMode: TravelMode.driving,
       // travelMode: TravelMode.driving,
     );
@@ -204,12 +169,12 @@ class PengirimanKurirController extends GetxController {
     if (_result.points.isNotEmpty) {
       // loop through all PointLatLng points and convert them
       // to a list of LatLng, required by the Polyline
-      _listLatLng = [latLng_permulaan];
+      _listLatLng = [latLngPermulaan];
       for (var point in _result.points) {
         _polylineCoordinates.add(LatLng(point.latitude, point.longitude));
         _listLatLng!.add(LatLng(point.latitude, point.longitude));
       }
-      _listLatLng!.add(latLng_pengiriman);
+      _listLatLng!.add(latLngPengiriman);
 
       Polyline polyline = Polyline(
         polylineId: const PolylineId("poly"),
@@ -231,7 +196,7 @@ class PengirimanKurirController extends GetxController {
     );
   }
 
-  lihat_foto_kiriman(BuildContext context, String fotoPengiriman) {
+  lihatFotoKiriman(BuildContext context, String fotoPengiriman) {
     if (fotoPengiriman != "") {
       Get.dialog(
         _FotoPengirimanDialogBox(
@@ -251,6 +216,257 @@ class PengirimanKurirController extends GetxController {
         snackPosition: SnackPosition.TOP,
       );
     }
+  }
+
+  void terimaPengiriman(String? sId) {
+    // dev.log("terima pengiriman");
+    // create get alert dialog
+    Get.dialog(
+      _TerimaBatalPengiriman(
+        text: "terima",
+        id: sId,
+      ),
+    );
+  }
+
+  // coba() {
+  //   loadPengiriman.value = 0;
+  //   pengirimanModelList.clear();
+  //   dev.log(loadPengiriman.value.toString());
+  //   dev.log(pengirimanModelList.toString());
+  // }
+
+  konfirmTerimaPengiriman(String? id) async {
+    // dev.log("konfirm terima pengiriman $id");
+    // coba();
+    await EasyLoading.show(
+      status: 'Loading...',
+      maskType: EasyLoadingMaskType.black,
+    );
+    Map<String, dynamic> _data = await KurirApi.sahkanPengiriman(id);
+    if (_data['status'] == 200) {
+      // loadPengiriman.value = 0;
+      Get.snackbar(
+        "Info",
+        "Pengiriman Disahkan Oleh Anda\nBisa Klik 'Mengambil Paket' jika ingin mengambil paket",
+        icon: const Icon(
+          Icons.info_outline_rounded,
+          color: Color.fromARGB(255, 2, 72, 72),
+        ),
+        backgroundColor: Colors.white,
+        duration: const Duration(seconds: 3),
+        snackPosition: SnackPosition.TOP,
+      );
+
+      // Get.back();
+      // futre 1 sec
+      // await Future.delayed(Duration(seconds: 1));
+      // loadPengiriman.value = 0;
+      // pengirimanModelList.value = [];
+      // await pengirimanAll();
+      // onReady();
+      final ctrl = Get.put<PengirimanKurirController>(
+        PengirimanKurirController(),
+      );
+      ctrl.onReady();
+    } else {
+      Get.snackbar(
+        "Info",
+        _data['message'],
+        icon: const Icon(
+          Icons.info_outline_rounded,
+          color: Colors.red,
+        ),
+        backgroundColor: const Color.fromARGB(255, 199, 214, 234),
+        duration: const Duration(seconds: 3),
+        snackPosition: SnackPosition.TOP,
+      );
+    }
+
+    await EasyLoading.dismiss();
+  }
+
+  void batalkanPengiriman(String? sId) {
+    // Get
+    Get.dialog(
+      _TerimaBatalPengiriman(
+        text: "batalkan",
+        id: sId,
+      ),
+    );
+  }
+
+  void konfirmBatalPengiriman(String? id) {
+    dev.log("konfirm batal pengiriman $id");
+  }
+
+  void mengambilPaket(String? sId) {
+    // Get
+    Get.dialog(
+      _TerimaBatalPengiriman(id: sId, text: 'mengambil' // mengambil paket
+          ),
+    );
+  }
+
+  void konfirmasiMengambilPaket(String? id) async {
+    // dev.log("konfirm terima pengiriman $id");
+    // coba();
+    await EasyLoading.show(
+      status: 'Loading...',
+      maskType: EasyLoadingMaskType.black,
+    );
+    Map<String, dynamic> _data = await KurirApi.mengambilPaketPengiriman(id);
+    if (_data['status'] == 200) {
+      // loadPengiriman.value = 0;
+      Get.snackbar(
+        "Info",
+        "Pengiriman Disahkan Oleh Anda\nBisa Klik 'Mengambil Paket' jika ingin mengambil paket",
+        icon: const Icon(
+          Icons.info_outline_rounded,
+          color: Color.fromARGB(255, 2, 72, 72),
+        ),
+        backgroundColor: Colors.white,
+        duration: const Duration(seconds: 3),
+        snackPosition: SnackPosition.TOP,
+      );
+
+      // Get.back();
+      // futre 1 sec
+      // await Future.delayed(Duration(seconds: 1));
+      // loadPengiriman.value = 0;
+      // pengirimanModelList.value = [];
+      // await pengirimanAll();
+      // onReady();
+      final ctrl = Get.put<PengirimanKurirController>(
+        PengirimanKurirController(),
+      );
+      ctrl.onReady();
+    } else {
+      Get.snackbar(
+        "Info",
+        _data['message'],
+        icon: const Icon(
+          Icons.info_outline_rounded,
+          color: Colors.red,
+        ),
+        backgroundColor: const Color.fromARGB(255, 199, 214, 234),
+        duration: const Duration(seconds: 3),
+        snackPosition: SnackPosition.TOP,
+      );
+    }
+
+    await EasyLoading.dismiss();
+  }
+}
+
+class _TerimaBatalPengiriman extends StatelessWidget {
+  _TerimaBatalPengiriman({
+    Key? key,
+    this.id,
+    required this.text,
+  }) : super(key: key);
+
+  final PengirimanKurirController controller = PengirimanKurirController();
+  final String? id;
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    late String _text;
+    switch (text) {
+      case "terima":
+        _text = "Anda akan menyetujui permintaan pengiriman ini";
+        break;
+      case "batalkan":
+        _text = "Anda akan membatalkan permintaan pengiriman ini";
+        break;
+      case "mengambil":
+        _text = "Anda akan mengambil paket pengiriman ini?";
+        break;
+    }
+
+    return AlertDialog(
+      content: Container(
+        height: MediaQuery.of(context).size.height * 0.2,
+        alignment: Alignment.topCenter,
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const Text(
+              "Info",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              _text,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 15,
+              ),
+            ),
+            const SizedBox(
+              height: 10,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                SizedBox(
+                  width: 75,
+                  height: 40,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: (text != 'batalkan')
+                          ? const Color.fromARGB(255, 2, 72, 72)
+                          : Colors.red,
+                    ),
+                    onPressed: () {
+                      Get.back();
+                      switch (text) {
+                        case "terima":
+                          controller.konfirmTerimaPengiriman(id);
+                          break;
+                        case "batalkan":
+                          controller.konfirmBatalPengiriman(id);
+                          break;
+                        case "mengambil":
+                          controller.konfirmasiMengambilPaket(id);
+                          break;
+                      }
+
+                      // if (text == 'terima') {
+                      //   controller.konfirmTerimaPengiriman(id);
+                      // } else {
+                      //   controller.konfirmBatalPengiriman(id);
+                      // }
+                    },
+                    child: const Text("Ya"),
+                  ),
+                ),
+                SizedBox(
+                  width: 75,
+                  height: 40,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: const Color.fromARGB(255, 104, 164, 164),
+                    ),
+                    onPressed: () {
+                      Get.back();
+                    },
+                    child: const Text("Tidak"),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
@@ -275,8 +491,8 @@ class _MapDialogBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Color.fromARGB(255, 104, 164, 164),
-      content: Container(
+      backgroundColor: const Color.fromARGB(255, 104, 164, 164),
+      content: SizedBox(
         height: Get.height * 0.5,
         child: GoogleMap(
           mapType: MapType.normal,
@@ -304,15 +520,15 @@ class _MapDialogBox extends StatelessWidget {
                       double.parse(data.kordinatPermulaan!.lng!))),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
-                  return Container(
+                  return SizedBox(
                     width: 200,
                     child: TextFormField(
                       enabled: false,
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                       initialValue: snapshot.data.toString() + " km",
                       decoration: InputDecoration(
                         labelText: 'Jarak Pengiriman',
-                        labelStyle: TextStyle(color: Colors.white),
+                        labelStyle: const TextStyle(color: Colors.white),
                         filled: true,
                         fillColor: Colors.transparent,
                         disabledBorder: OutlineInputBorder(
@@ -330,16 +546,16 @@ class _MapDialogBox extends StatelessWidget {
                     ),
                   );
                 } else if (snapshot.hasError) {
-                  return Text(
+                  return const Text(
                     "Error mengambil data",
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       color: Colors.white,
                       overflow: TextOverflow.ellipsis,
                     ),
                   );
                 } else {
-                  return Center(
+                  return const Center(
                     child: CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(
                         Colors.white,
@@ -369,7 +585,7 @@ class _FotoPengirimanDialogBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Color.fromARGB(255, 104, 164, 164),
+      backgroundColor: const Color.fromARGB(255, 104, 164, 164),
       title: const Text(
         "Foto Pengiriman",
         style: TextStyle(color: Colors.white),
@@ -399,13 +615,25 @@ class _FotoPengirimanDialogBox extends StatelessWidget {
                 fit: BoxFit.cover,
               ),
             ),
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: NetworkImage(fotoPengiriman),
-                  fit: BoxFit.cover,
-                ),
-              ),
+            // child: Container(
+            //   decoration: BoxDecoration(
+            //     image: DecorationImage(
+            //       image: NetworkImage(fotoPengiriman),
+            //       fit: BoxFit.cover,
+            //     ),
+            //   ),
+            // ),
+            child: Image.network(
+              fotoPengiriman,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return const Center(
+                  child: Icon(
+                    Icons.error,
+                    color: Colors.black,
+                  ),
+                );
+              },
             ),
           ),
         ),

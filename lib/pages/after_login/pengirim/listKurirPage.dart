@@ -30,7 +30,7 @@ class ListKurirPage extends GetView<ListKurirController> {
               ),
             ),
           ),
-          _TopSearchInputField(),
+          const _TopSearchInputField(),
         ],
       ),
     );
@@ -168,32 +168,31 @@ class _KurirDetailBox extends StatelessWidget {
           children: [
             Expanded(
               flex: 2,
-              child: Container(
-                width: 60,
-                height: 60,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color.fromARGB(255, 165, 163, 163)
-                          .withOpacity(0.5),
-                      blurRadius: 10,
-                      spreadRadius: 5,
+              child: Center(
+                child: Container(
+                  width: 70,
+                  height: 70,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: CircleAvatar(
+                    radius: 50.0,
+                    // backgroundImage: NetworkImage(
+                    //     pengirimanModel.kurir!.photo_url ??
+                    //         'https://via.placeholder.com/150'),
+                    backgroundColor: Colors.transparent,
+                    child: ClipOval(
+                      child: Image.network(
+                        data.photo_url ?? 'https://via.placeholder.com/150',
+                        fit: BoxFit.cover,
+                        width: 100,
+                        height: 100,
+                        errorBuilder: (context, url, error) {
+                          return const Icon(Icons.error);
+                        },
+                      ),
                     ),
-                  ],
-                  image: const DecorationImage(
-                    image: AssetImage('assets/loading.gif'),
-                    fit: BoxFit.fitHeight,
                   ),
-                ),
-                child: CircleAvatar(
-                  radius: 30.0,
-                  backgroundImage: NetworkImage(
-                    data.photo_url ?? 'https://via.placeholder.com/150',
-                    scale: 0.5,
-                  ),
-                  backgroundColor: Colors.transparent,
                 ),
               ),
             ),
