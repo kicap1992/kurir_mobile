@@ -1,16 +1,17 @@
 // ignore_for_file: file_names
 
-import 'dart:developer' as dev;
-
 import 'package:enhance_stepper/enhance_stepper.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:kurir/function/allFunction.dart';
-import 'package:kurir/models/pengirimimanModel.dart';
+import 'package:logger/logger.dart';
 
 import '../../../api/kurirApi.dart';
+import '../../../function/allFunction.dart';
+import '../../../models/pengirimimanModel.dart';
 
 class ProgressPenghantaranControllerKurir extends GetxController {
+  final dev = Logger();
+
   Rx<String> text = "heheh".obs;
   String id = Get.arguments;
   Rx<Widget> enhanceStepContainer = Container(
@@ -29,14 +30,16 @@ class ProgressPenghantaranControllerKurir extends GetxController {
   void onInit() {
     super.onInit();
     // text.value = "heheh222";
-    dev.log("disini progress penghantaran bagian kurir berlaku");
+    dev.i("disini progress penghantaran bagian kurir berlaku");
 
     // future 3 sec
     getData();
   }
 
   void getData() async {
-    Map<String, dynamic> _data = await KurirApi.detailPengiriman(id);
+    final _api = Get.put(KurirApi());
+
+    Map<String, dynamic> _data = await _api.detailPengiriman(id);
     if (_data["status"] == 200) {
       final PengirimanModel _pengiriman =
           PengirimanModel.fromJson(_data["data"]);
@@ -69,6 +72,7 @@ class ProgressPenghantaranControllerKurir extends GetxController {
         fontSize: 15,
       ),
     );
+
     switch (data.statusPengiriman) {
       case "Dalam Pengesahan Kurir":
         _icon = const Icon(
@@ -119,13 +123,38 @@ class ProgressPenghantaranControllerKurir extends GetxController {
           size: 30,
         );
         _title = const Text(
-          "Mengambil Paket Pengiriman Dari Pengirim",
+          "Dalam Perjalanan Mengambil Paket Pengiriman Dari Pengirim",
           style: TextStyle(
             color: Colors.white,
             fontSize: 20,
           ),
         );
-        _content = const _MengambilPaketKirimanRichtext();
+        _content = _MengambilPaketKirimanRichtext(
+            terima: (pengiriman.statusPengiriman ==
+                    "Mengambil Paket Pengiriman Dari Pengirim")
+                ? true
+                : false,
+            waktu: (pengiriman.statusPengiriman !=
+                        "Mengambil Paket Pengiriman Dari Pengirim" ||
+                    pengiriman.statusPengiriman != "Disahkan Kurir" ||
+                    pengiriman.statusPengiriman != "Dalam Pengesahan Kurir")
+                ? AllFunction.timeZoneAdd8(pengiriman.history![3].waktu)
+                : null);
+        break;
+      case "Menghantar Paket Pengiriman Ke Penerima":
+        _icon = const Icon(
+          Icons.handshake_outlined,
+          color: Colors.white,
+          size: 30,
+        );
+        _title = const Text(
+          "Dalam Perjalanan Menghantar Paket Pengiriman Ke Penerima",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        );
+        _content = const _MenghantarPaketKirimanRichtext();
         break;
     }
 
@@ -139,8 +168,8 @@ class ProgressPenghantaranControllerKurir extends GetxController {
   }
 }
 
-class _MengambilPaketKirimanRichtext extends StatelessWidget {
-  const _MengambilPaketKirimanRichtext({
+class _MenghantarPaketKirimanRichtext extends StatelessWidget {
+  const _MenghantarPaketKirimanRichtext({
     Key? key,
   }) : super(key: key);
 
@@ -158,7 +187,7 @@ class _MengambilPaketKirimanRichtext extends StatelessWidget {
             children: [
               TextSpan(
                   text:
-                      "Dalam perjalanan mengambail paker dari pengirim. Klik "),
+                      "Paket diterima dari pengirim. Dalam perjalanan menghantar paket ke penerima. Klik "),
               TextSpan(
                 text: "'Terima Paket Pengiriman' ",
                 style: TextStyle(
@@ -166,7 +195,7 @@ class _MengambilPaketKirimanRichtext extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              TextSpan(text: "jika sampai ke lokasi pengirim & scan "),
+              TextSpan(text: "jika sampai ke lokasi penerima & scan "),
               TextSpan(
                 text: "QRcode ",
                 style: TextStyle(
@@ -182,7 +211,7 @@ class _MengambilPaketKirimanRichtext extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              TextSpan(text: "untuk melihat rute lokasi pengirim."),
+              TextSpan(text: "untuk melihat rute lokasi penerima."),
             ],
           ),
         ),
@@ -194,12 +223,97 @@ class _MengambilPaketKirimanRichtext extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: const [
-              _ExpandedButton(flex: 2, text: 'Terima Paket\nPengiriman'),
+              _ExpandedButton(flex: 2, text: 'Serahkan Paket\nPengiriman'),
               Expanded(flex: 1, child: SizedBox()),
               _ExpandedButton(flex: 2, text: 'Rute Lokasi'),
             ],
           ),
         ),
+      ],
+    );
+  }
+}
+
+class _MengambilPaketKirimanRichtext extends StatelessWidget {
+  _MengambilPaketKirimanRichtext({
+    Key? key,
+    required this.terima,
+    this.waktu,
+  }) : super(key: key);
+
+  final bool terima;
+  final String? waktu;
+
+  final dev = Logger();
+
+  @override
+  Widget build(BuildContext context) {
+    dev.i("terima: $terima");
+    return Column(
+      children: [
+        if (terima)
+          RichText(
+            textAlign: TextAlign.justify,
+            text: const TextSpan(
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+              ),
+              children: [
+                TextSpan(
+                    text:
+                        "Dalam perjalanan mengambil paker dari pengirim. Klik "),
+                TextSpan(
+                  text: "'Terima Paket Pengiriman' ",
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextSpan(text: "jika sampai ke lokasi pengirim & scan "),
+                TextSpan(
+                  text: "QRcode ",
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextSpan(text: "yang ada pada aplikasi pengirim. Klik "),
+                TextSpan(
+                  text: "'Rute Lokasi' ",
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextSpan(text: "untuk melihat rute lokasi pengirim."),
+              ],
+            ),
+          ),
+        if (!terima)
+          Text(
+            "Paket telah diterima dari pengirim.\nPaket diterima pada waktu $waktu\nDalam perjalanan menghantar paket ke penerima.",
+            textAlign: TextAlign.left,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 15,
+            ),
+          ),
+        const SizedBox(
+          height: 10,
+        ),
+        if (terima)
+          SizedBox(
+            width: double.infinity,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: const [
+                _ExpandedButton(flex: 2, text: 'Terima Paket\nPengiriman'),
+                Expanded(flex: 1, child: SizedBox()),
+                _ExpandedButton(flex: 2, text: 'Rute Lokasi'),
+              ],
+            ),
+          ),
       ],
     );
   }

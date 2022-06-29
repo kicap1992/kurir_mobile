@@ -3,6 +3,7 @@
 import 'package:get/get.dart';
 
 import '../controller/after_login/kurir/indexController.dart';
+import '../controller/after_login/kurir/logKirimanController.dart';
 import '../controller/after_login/kurir/pengaturanController.dart';
 import '../controller/after_login/kurir/pengirimanController.dart';
 
@@ -13,5 +14,6 @@ class KurirIndexBinding extends Bindings {
 
     Get.lazyPut<PengaturanKurirController>(() => PengaturanKurirController());
     Get.lazyPut<PengirimanKurirController>(() => PengirimanKurirController());
+    Get.lazyPut<LogKirimanControllerKurir>(() => LogKirimanControllerKurir());
   }
 }

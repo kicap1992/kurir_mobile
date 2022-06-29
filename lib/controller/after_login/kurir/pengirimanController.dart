@@ -52,8 +52,11 @@ class PengirimanKurirController extends GetxController {
   pengirimanAll() async {
     loadPengiriman.value = 0;
     pengirimanModelList.value = [];
+
+    final _api = Get.put(KurirApi());
+
     Map<String, dynamic> _data =
-        await KurirApi.getAllPengirimanDalamPengesahanKurir();
+        await _api.getAllPengirimanDalamPengesahanKurir();
 
     if (_data['status'] == 200) {
       if (_data['data'].length > 0) {
@@ -83,7 +86,8 @@ class PengirimanKurirController extends GetxController {
   }
 
   cekDistance(LatLng latLngPengiriman, LatLng latLngPermulaan) async {
-    double distance = await PengirimApi.jarak_route(
+    final _api = Get.put(PengirimApi());
+    double distance = await _api.jarak_route(
       latLngPermulaan.latitude,
       latLngPermulaan.longitude,
       latLngPengiriman.latitude,
@@ -243,7 +247,10 @@ class PengirimanKurirController extends GetxController {
       status: 'Loading...',
       maskType: EasyLoadingMaskType.black,
     );
-    Map<String, dynamic> _data = await KurirApi.sahkanPengiriman(id);
+
+    final _api = Get.put(KurirApi());
+
+    Map<String, dynamic> _data = await _api.sahkanPengiriman(id);
     if (_data['status'] == 200) {
       // loadPengiriman.value = 0;
       Get.snackbar(
@@ -315,7 +322,10 @@ class PengirimanKurirController extends GetxController {
       status: 'Loading...',
       maskType: EasyLoadingMaskType.black,
     );
-    Map<String, dynamic> _data = await KurirApi.mengambilPaketPengiriman(id);
+
+    final _api = Get.put(KurirApi());
+
+    Map<String, dynamic> _data = await _api.mengambilPaketPengiriman(id);
     if (_data['status'] == 200) {
       // loadPengiriman.value = 0;
       Get.snackbar(

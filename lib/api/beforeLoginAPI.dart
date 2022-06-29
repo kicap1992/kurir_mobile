@@ -2,34 +2,26 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 import '../globals.dart' as globals;
 
-class BeforeLoginApi extends ChangeNotifier {
-// class BeforeLoginApi {
-  static var client = http.Client();
-
+class BeforeLoginApi extends GetConnect {
+  static final log = Logger();
   static var storage = GetStorage();
 
-  static clientClose(http.Client client) {
-    client.close();
-  }
-
-  // sign up kurir
-  static Future<Map<String, dynamic>> sign_up_kurir(Map data, String fotoKTP,
+  Future<Map<String, dynamic>> sign_up_kurir(Map data, String fotoKTP,
       String fotoHoldingKTP, String fotoKendaraan, String fotoProfil) async {
     Map<String, dynamic> result;
-    client = http.Client();
-    // result = "sini berlakunya signup";
-    bool _cek_jaringan = await cek_jaringan(client);
 
-    if (_cek_jaringan) {
+    bool _checkServer = await cek_jaringan();
+
+    if (_checkServer) {
       try {
         await EasyLoading.show(
           status: 'Melakukan\nPendaftaran...',
@@ -48,14 +40,14 @@ class BeforeLoginApi extends ChangeNotifier {
             .add(await http.MultipartFile.fromPath('photo', fotoProfil));
 
         var streamResponse =
-            await request.send().timeout(const Duration(seconds: 30));
+            await request.send().timeout(const Duration(seconds: 120));
         // var streamResponse = await request.send();
         var response = await http.Response.fromStream(streamResponse);
 
-        var datanya = jsonDecode(response.body);
+        final datanya = jsonDecode(response.body);
 
-        log(response.statusCode.toString() + " ini status code");
-        log(datanya.toString());
+        log.i(response.statusCode.toString() + " ini status code");
+        log.i(datanya.toString());
         if (response.statusCode == 200) {
           result = {
             'status': response.statusCode,
@@ -72,24 +64,33 @@ class BeforeLoginApi extends ChangeNotifier {
         await EasyLoading.dismiss();
         // closeClient();
 
-        log(e.toString() + " ini error socket");
+        log.i(e.toString() + " ini error socket");
         result = {
           'status': 500,
           'message': "Tidak dapat terhubung ke server,koneksi timeout"
         };
       } on TimeoutException catch (e) {
         // client.close();
-        log(e.toString() + " ini timeout");
+        log.i(e.toString() + " ini timeout");
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on Exception catch (e) {
+        // client.close();
+        log.i(e.toString() + " ini error");
         result = {
           'status': 500,
           'message': "Tidak dapat terhubung ke server,koneksi timeout"
         };
       } catch (e) {
-        log(e.toString() + " ini di catch");
+        log.i(e.toString() + " ini di catch");
         result = {
           'status': 500,
           'message': "Tidak dapat terhubung ke server,koneksi timeout"
         };
+      } finally {
+        await EasyLoading.dismiss();
       }
     } else {
       result = {
@@ -102,132 +103,126 @@ class BeforeLoginApi extends ChangeNotifier {
   }
 
   // sign up pengirim
-  static Future<Map<String, dynamic>> sign_up_pengirim(
+  Future<Map<String, dynamic>> sign_up_pengirim(
       Map data, String fotoProfil) async {
-    // open client
-    client = http.Client();
     Map<String, dynamic> result;
-    // result = {'status': 500, 'message': "sini berlakunya signup pengirim"};
 
-    bool _cek_jaringan = await cek_jaringan(client);
+    bool _checkServer = await cek_jaringan();
 
-    log("cek jaringan : " + _cek_jaringan.toString());
+    if (_checkServer) {
+      try {
+        await EasyLoading.show(
+          status: 'Melakukan\nPendaftaran...',
+          maskType: EasyLoadingMaskType.black,
+        );
 
-    if (!_cek_jaringan) {
-      result = {
-        'status': 500,
-        'message':
-            "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
-      };
-    } else {
-      if (_cek_jaringan) {
-        try {
-          await EasyLoading.show(
-            status: 'Melakukan\nPendaftaran...',
-            maskType: EasyLoadingMaskType.black,
-          );
-          var postUri = Uri.parse('${globals.http_to_server}api/login/daftar1');
-          var request = http.MultipartRequest("POST", postUri);
-          request.fields['data'] = jsonEncode(data);
+        var postUri = Uri.parse('${globals.http_to_server}api/login/daftar1');
+        var request = http.MultipartRequest("POST", postUri);
+        request.fields['data'] = jsonEncode(data);
 
-          request.files
-              .add(await http.MultipartFile.fromPath('photo', fotoProfil));
+        request.files
+            .add(await http.MultipartFile.fromPath('photo', fotoProfil));
 
-          var streamResponse =
-              await request.send().timeout(const Duration(seconds: 30));
-          // var streamResponse = await request.send();
-          var response = await http.Response.fromStream(streamResponse);
+        var streamResponse =
+            await request.send().timeout(const Duration(seconds: 60));
+        // var streamResponse = await request.send();
+        var response = await http.Response.fromStream(streamResponse);
 
-          var datanya = jsonDecode(response.body);
+        // final form = FormData({
+        //   'photo': MultipartFile(File(fotoProfil).readAsBytesSync(),
+        //       filename: 'photo.jpg'),
+        //   'data': jsonEncode(data),
+        // });
 
-          log(response.statusCode.toString() + " ini status code");
-          log(datanya.toString());
-          if (response.statusCode == 200) {
-            result = {
-              'status': response.statusCode,
-              'message': datanya['message'],
-            };
-          } else {
-            result = {
-              'status': response.statusCode,
-              'message': datanya['message']
-            };
-          }
-        } on SocketException catch (e) {
-          // abort the client
-          await EasyLoading.dismiss();
-          // closeClient();
+        // final response =
+        //     await post('${globals.http_to_server}api/login/daftar1', form);
 
-          log(e.toString() + " ini error socket");
+        var datanya = jsonDecode(response.body);
+
+        log.i(response.statusCode.toString() + " ini status code");
+        log.i(datanya.toString());
+        if (response.statusCode == 200) {
           result = {
-            'status': 500,
-            'message': "Tidak dapat terhubung ke server,koneksi timeout"
+            'status': response.statusCode,
+            'message': datanya['message'],
           };
-        } on TimeoutException catch (e) {
-          // client.close();
-          log(e.toString() + " ini timeout");
+        } else {
           result = {
-            'status': 500,
-            'message': "Tidak dapat terhubung ke server,koneksi timeout"
-          };
-        } catch (e) {
-          log(e.toString() + " ini di catch");
-          result = {
-            'status': 500,
-            'message': "Tidak dapat terhubung ke server,koneksi timeout"
+            'status': response.statusCode,
+            'message': datanya['message']
           };
         }
-      } else {
+      } on SocketException catch (e) {
+        // abort the client
+        await EasyLoading.dismiss();
+        // closeClient();
+
+        log.i(e.toString() + " ini error socket");
         result = {
           'status': 500,
           'message': "Tidak dapat terhubung ke server,koneksi timeout"
         };
+      } on TimeoutException catch (e) {
+        // client.close();
+        log.i(e.toString() + " ini timeout");
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on Exception catch (e) {
+        // client.close();
+        log.i(e.toString() + " ini error");
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } catch (e) {
+        log.i(e.toString() + " ini di catch");
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } finally {
+        await EasyLoading.dismiss();
       }
+    } else {
+      result = {
+        'status': 500,
+        'message': "Tidak dapat terhubung ke server,koneksi timeout"
+      };
     }
 
     return result;
   }
 
   // log in user
-  static Future<Map<String, dynamic>> log_in_user(
+  Future<Map<String, dynamic>> log_in_user(
       String username, String password, String role) async {
-    client = http.Client();
+    // client = http.Client();
     late Map<String, dynamic> result;
 
-    bool _cek_jaringan = await cek_jaringan(client);
+    bool _checkServer = await cek_jaringan();
 
-    log("cek jaringan : " + _cek_jaringan.toString());
-
-    if (!_cek_jaringan) {
-      result = {
-        'status': 500,
-        'message':
-            "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
-      };
-    } else {
-      // wait for 3 sec
+    if (_checkServer) {
       try {
         await EasyLoading.show(
           status: 'Sedang\nLogin\n...',
           maskType: EasyLoadingMaskType.black,
         );
-        var _url = Uri.parse(
+
+        // var _response = await get(
+        //     '${globals.http_to_server}api/login?username=$username&password=$password&role=$role');
+        var uri = Uri.parse(
             '${globals.http_to_server}api/login?username=$username&password=$password&role=$role');
-        var _response = await http.get(
-          _url,
-          // body: {'username': username, 'password': password, 'role': role},
-          headers: {
-            "Accept": "application/json",
-            // "authorization":
-            //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-            "crossDomain": "true"
-          },
-        );
+        var _response = await http.get(uri, headers: {
+          'Content-Type': 'application/json',
+          "crossDomain": "true",
+        }).timeout(const Duration(seconds: 15));
 
         var _data = jsonDecode(_response.body);
 
-        log(_response.statusCode.toString() + " ini status code");
-        log(_data['data']['_idnya'].toString() + " ini id");
+        log.i(_response.statusCode.toString() + " ini status code");
+        log.i(_data['data']['_idnya'].toString() + " ini id");
         if (_response.statusCode == 200) {
           storage.write('username', username);
           storage.write('password', password);
@@ -248,16 +243,35 @@ class BeforeLoginApi extends ChangeNotifier {
             'focus': _data['data'],
           };
         }
-      } catch (e) {
-        storage.erase();
-        log(e.toString() + " ini di catch");
+      } on TimeoutException catch (e) {
+        log.i(e.toString() + " ini timeout");
         result = {
           'status': 500,
           'message': "Tidak dapat terhubung ke server,koneksi timeout"
         };
+      } on Exception catch (e) {
+        log.i(e.toString() + " ini error");
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } catch (e) {
+        log.i(e.toString() + " ini di catch");
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } finally {
+        await EasyLoading.dismiss();
       }
+    } else {
+      result = {
+        'status': 500,
+        'message': "Tidak dapat terhubung ke server,koneksi timeout"
+      };
     }
 
+    await EasyLoading.dismiss();
     return result;
   }
 
@@ -270,13 +284,18 @@ class BeforeLoginApi extends ChangeNotifier {
   }
 
   // checking connection to server
-  static Future<bool> cek_jaringan(http.Client client) async {
+  Future<bool> cek_jaringan() async {
     late bool result;
 
     // client get for globals.http_to_server
+    await EasyLoading.show(
+      status: 'Sedang\nCek\nJaringan\n...',
+      maskType: EasyLoadingMaskType.black,
+    );
+
     try {
       var response =
-          await client.get(Uri.parse("${globals.http_to_server}api"), headers: {
+          await http.get(Uri.parse("${globals.http_to_server}api"), headers: {
         "Accept": "application/json",
         // "authorization":
         //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
@@ -289,66 +308,25 @@ class BeforeLoginApi extends ChangeNotifier {
         result = false;
       }
     } on SocketException {
-      await EasyLoading.dismiss();
       result = false;
-      await clientClose(client);
-      log(" ini error socket");
+      // await clientClose(client);
+      log.i(" ini error socket");
     } on TimeoutException {
       await EasyLoading.dismiss();
       result = false;
       // close client
-      await clientClose(client);
-      log(" ini timeout");
+      // await clientClose(client);
+      log.i(" ini timeout");
     } on Exception {
       result = false;
-      log(" ini timeout");
+      log.i(" ini timeout");
     } catch (e) {
       result = false;
-      log(" ini timeout");
+      log.i(" ini timeout");
+    } finally {
+      await EasyLoading.dismiss();
     }
 
     return result;
   }
-
-  // // checking connection to server
-  // Future<bool> cek_jaringan1(http.Client client) async {
-  //   late bool result;
-
-  //   // client get for globals.http_to_server
-  //   try {
-  //     var response =
-  //         await client.get(Uri.parse("${globals.http_to_server}api"), headers: {
-  //       "Accept": "application/json",
-  //       // "authorization":
-  //       //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-  //       "crossDomain": "true"
-  //     }).timeout(const Duration(seconds: 5));
-  //     // final data = jsonDecode(response.body);
-  //     if (response.statusCode == 200) {
-  //       result = true;
-  //     } else {
-  //       result = false;
-  //     }
-  //   } on SocketException {
-  //     await EasyLoading.dismiss();
-  //     result = false;
-  //     await clientClose(client);
-  //     log(" ini error socket");
-  //   } on TimeoutException {
-  //     await EasyLoading.dismiss();
-  //     result = false;
-  //     // close client
-  //     await clientClose(client);
-  //     log(" ini timeout");
-  //   } on Exception {
-  //     result = false;
-  //     log(" ini timeout");
-  //   } catch (e) {
-  //     result = false;
-  //     log(" ini timeout");
-  //   }
-
-  //   return result;
-  // }
-
 }

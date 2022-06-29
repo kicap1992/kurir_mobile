@@ -18,7 +18,9 @@ class ListKurirController extends GetxController {
   kurirAll() async {
     loadKurir.value = 0;
     kurirModelList.value = [];
-    Map<String, dynamic> _data = await PengirimApi.getAllKurir();
+
+    final _api = Get.put(PengirimApi());
+    Map<String, dynamic> _data = await _api.getAllKurir();
     // dev.log(_data.toString());
 
     if (_data['status'] == 200) {

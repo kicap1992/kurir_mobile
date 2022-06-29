@@ -118,7 +118,9 @@ class InfoPengirimanController extends GetxController {
       );
       _polylines.add(polyline);
 
-      double distance = await PengirimApi.jarak_route(
+      final _api = Get.put(PengirimApi());
+
+      double distance = await _api.jarak_route(
         latLng_permulaan.latitude,
         latLng_permulaan.longitude,
         latLng_pengiriman.latitude,

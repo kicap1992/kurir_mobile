@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:logger/logger.dart';
 
 import '../../../controller/after_login/pengirim/listKurirController.dart';
 import '../../../models/usersModel.dart';
@@ -136,12 +137,13 @@ class _MainDetail extends StatelessWidget {
 }
 
 class _KurirDetailBox extends StatelessWidget {
-  const _KurirDetailBox({
+  _KurirDetailBox({
     Key? key,
     required this.data,
   }) : super(key: key);
 
   final KurirModel data;
+  final log = Logger();
 
   @override
   Widget build(BuildContext context) {
@@ -170,25 +172,38 @@ class _KurirDetailBox extends StatelessWidget {
               flex: 2,
               child: Center(
                 child: Container(
+                  padding: const EdgeInsets.all(2),
+                  alignment: Alignment.center,
                   width: 70,
                   height: 70,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color.fromARGB(255, 165, 163, 163)
+                            .withOpacity(0.5),
+                        blurRadius: 10,
+                        spreadRadius: 5,
+                      ),
+                    ],
+                    image: const DecorationImage(
+                      image: AssetImage(
+                        'assets/loading.gif',
+                      ),
+                      fit: BoxFit.cover,
+                    ),
                   ),
-                  child: CircleAvatar(
-                    radius: 50.0,
-                    // backgroundImage: NetworkImage(
-                    //     pengirimanModel.kurir!.photo_url ??
-                    //         'https://via.placeholder.com/150'),
-                    backgroundColor: Colors.transparent,
-                    child: ClipOval(
-                      child: Image.network(
-                        data.photo_url ?? 'https://via.placeholder.com/150',
+                  child: Container(
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                        image: NetworkImage(
+                          data.photo_url ?? 'https://via.placeholder.com/150',
+                        ),
                         fit: BoxFit.cover,
-                        width: 100,
-                        height: 100,
-                        errorBuilder: (context, url, error) {
-                          return const Icon(Icons.error);
+                        onError: (object, stack) {
+                          log.e(object, stack);
                         },
                       ),
                     ),

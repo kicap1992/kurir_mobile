@@ -1,54 +1,36 @@
-// ignore_for_file: non_constant_identifier_names, file_names
-// ignore: unused_import
-import 'dart:developer' as dev;
+// ignore_for_file: file_names
 
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
-
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
 import '../globals.dart' as globals;
 
-class KurirApi {
-  static var client = http.Client();
-
+class KurirApi extends GetConnect {
   static var storage = GetStorage();
 
   static var username = storage.read("username");
   static var password = storage.read("password");
   static var id = storage.read("id");
 
-  static clientClose(http.Client client) {
-    client.close();
-  }
-
   // get all pengiriman status ='Dalam Pengesahan Kurir'
-  static Future<Map<String, dynamic>>
-      getAllPengirimanDalamPengesahanKurir() async {
-    client = http.Client();
+  Future<Map<String, dynamic>> getAllPengirimanDalamPengesahanKurir() async {
     late Map<String, dynamic> result;
 
-    bool _cek_jaringan = await cek_jaringan(client);
+    bool _checkServer = await cek_jaringan();
 
-    log("cek jaringan : " + _cek_jaringan.toString());
-
-    if (!_cek_jaringan) {
-      result = {
-        'status': 500,
-        'message':
-            "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
-      };
-    } else {
-      // wait for 3 sec
-      // await Future.delayed(Duration(seconds: 3));
-      // result = {'status': 200, 'message': "sini dia"};
-
+    if (_checkServer) {
       try {
-        // log("${globals.http_to_server}api/kurir/get_all_kurir_dalam_pengesahan?username=$username&password=$password&id=$id");
-        var response = await client.get(
+        await EasyLoading.show(
+          status: 'Loading...',
+          maskType: EasyLoadingMaskType.black,
+        );
+
+        var response = await http.get(
             Uri.parse(
                 "${globals.http_to_server}api/kurir/pengiriman_kurir_dalam_pengesahan?username=$username&password=$password&id=$id"),
             headers: {
@@ -69,42 +51,131 @@ class KurirApi {
         } else {
           result = {'status': 400, 'message': "Server Error", 'data': data};
         }
-      } catch (e) {
-        // dev.log(e.toString());
+      } on SocketException {
+        // abort the client
+        // closeClient();
+
         result = {
           'status': 500,
-          'message':
-              "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
         };
+      } on TimeoutException {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on Exception {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } catch (e) {
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } finally {
+        await EasyLoading.dismiss();
       }
+    } else {
+      result = {
+        'status': 500,
+        'message': "Tidak dapat terhubung ke server,koneksi timeout"
+      };
+    }
+
+    return result;
+  }
+
+  // get all pengiriman status ='Paket Diterima Oleh Penerima, Ditolak Oleh Kurir, Dibatalkan Oleh Pengirim'
+  Future<Map<String, dynamic>> getAllPengirimanCompleted() async {
+    late Map<String, dynamic> result;
+
+    bool _checkServer = await cek_jaringan();
+
+    if (_checkServer) {
+      try {
+        await EasyLoading.show(
+          status: 'Loading...',
+          maskType: EasyLoadingMaskType.black,
+        );
+
+        var response = await http.get(
+            Uri.parse(
+                "${globals.http_to_server}api/kurir/pengiriman_completed?username=$username&password=$password&id=$id"),
+            headers: {
+              "Accept": "application/json",
+              // "authorization":
+              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+              "crossDomain": "true"
+            }).timeout(const Duration(seconds: 10));
+        final data = jsonDecode(response.body);
+        // log(data.toString());
+        // log("ini status : " + response.statusCode.toString());
+        if (response.statusCode == 200) {
+          result = {
+            'status': 200,
+            'message': data['message'],
+            'data': data['data']
+          };
+        } else {
+          result = {'status': 400, 'message': "Server Error", 'data': data};
+        }
+      } on SocketException {
+        // abort the client
+        // closeClient();
+
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on TimeoutException {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on Exception {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } catch (e) {
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } finally {
+        await EasyLoading.dismiss();
+      }
+    } else {
+      result = {
+        'status': 500,
+        'message': "Tidak dapat terhubung ke server,koneksi timeout"
+      };
     }
 
     return result;
   }
 
   // cek pengaturan kurir
-  static Future<Map<String, dynamic>> cekPengaturanKurir() async {
-    client = http.Client();
+  Future<Map<String, dynamic>> cekPengaturanKurir() async {
     late Map<String, dynamic> result;
 
-    bool _cek_jaringan = await cek_jaringan(client);
+    bool _checkServer = await cek_jaringan();
 
-    log("cek jaringan : " + _cek_jaringan.toString());
-
-    if (!_cek_jaringan) {
-      result = {
-        'status': 500,
-        'message':
-            "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
-      };
-    } else {
-      // wait for 3 sec
-      // await Future.delayed(Duration(seconds: 3));
-      // result = {'status': 200, 'message': "sini dia"};
+    if (_checkServer) {
+      await EasyLoading.show(
+        status: 'Loading...',
+        maskType: EasyLoadingMaskType.black,
+      );
 
       try {
         log("${globals.http_to_server}api/kurir/pengaturan?username=$username&password=$password&id=$id");
-        var response = await client.get(
+        var response = await http.get(
             Uri.parse(
                 "${globals.http_to_server}api/kurir/pengaturan?username=$username&password=$password&id=$id"),
             headers: {
@@ -129,40 +200,58 @@ class KurirApi {
             'data': data
           };
         }
+      } on SocketException {
+        // abort the client
+        // closeClient();
+
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on TimeoutException {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on Exception {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
       } catch (e) {
         result = {
           'status': 500,
-          'message':
-              "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
         };
+      } finally {
+        await EasyLoading.dismiss();
       }
+    } else {
+      result = {
+        'status': 500,
+        'message': "Tidak dapat terhubung ke server,koneksi timeout"
+      };
     }
 
     return result;
   }
 
   // tambah/edit pengaturan kurir
-  static Future<Map<String, dynamic>> pengaturanKurir(
+  Future<Map<String, dynamic>> pengaturanKurir(
       String minimalBiaya, String maksimalBiaya, String biayaPerKilo) async {
-    client = http.Client();
     late Map<String, dynamic> result;
 
-    bool _cek_jaringan = await cek_jaringan(client);
+    bool _checkServer = await cek_jaringan();
 
-    log("cek jaringan : " + _cek_jaringan.toString());
-    if (!_cek_jaringan) {
-      result = {
-        'status': 500,
-        'message':
-            "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
-      };
-    } else {
-      // wait for 3 sec
-      // await Future.delayed(Duration(seconds: 3));
-      // result = {'status': 200, 'message': "sini dia"};
-
+    if (_checkServer) {
       try {
-        var response = await client.post(
+        await EasyLoading.show(
+          status: 'Loading...',
+          maskType: EasyLoadingMaskType.black,
+        );
+        var response = await http.post(
             Uri.parse(
                 "${globals.http_to_server}api/kurir/pengaturan?username=$username&password=$password&id=$id"),
             headers: {
@@ -188,40 +277,53 @@ class KurirApi {
             'data': data
           };
         }
+      } on SocketException {
+        // abort the client
+        // closeClient();
+
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on TimeoutException {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on Exception {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
       } catch (e) {
         result = {
           'status': 500,
-          'message':
-              "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
         };
+      } finally {
+        await EasyLoading.dismiss();
       }
+    } else {
+      result = {
+        'status': 500,
+        'message': "Tidak dapat terhubung ke server,koneksi timeout"
+      };
     }
 
     return result;
   }
 
   // terima pengiriman kurir dan ubah status ke 'Pengiriman Disahkan kurir'
-  static Future<Map<String, dynamic>> sahkanPengiriman(
-      String? idPengiriman) async {
-    client = http.Client();
+  Future<Map<String, dynamic>> sahkanPengiriman(String? idPengiriman) async {
     late Map<String, dynamic> result;
-    bool _cek_jaringan = await cek_jaringan(client);
 
-    // log("cek jaringan : " + _cek_jaringan.toString());
+    bool _checkServer = await cek_jaringan();
 
-    if (!_cek_jaringan) {
-      result = {
-        'status': 500,
-        'message':
-            "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
-      };
-    } else {
-      // wait for 3 sec
-      // await Future.delayed(Duration(seconds: 3));
-      // result = {'status': 200, 'message': "sini dia"};
-
+    if (_checkServer) {
       try {
-        var response = await client.post(
+        var response = await http.post(
             Uri.parse(
                 "${globals.http_to_server}api/kurir/sahkan_pengiriman?username=$username&password=$password&id=$id"),
             headers: {
@@ -249,35 +351,52 @@ class KurirApi {
             'data': data
           };
         }
+      } on SocketException {
+        // abort the client
+        // closeClient();
+
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on TimeoutException {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on Exception {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
       } catch (e) {
         result = {
           'status': 500,
-          'message':
-              "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
         };
+      } finally {
+        await EasyLoading.dismiss();
       }
+    } else {
+      result = {
+        'status': 500,
+        'message': "Tidak dapat terhubung ke server,koneksi timeout"
+      };
     }
 
     return result;
   }
 
-  static Future<Map<String, dynamic>> detailPengiriman(
-      String idPengiriman) async {
-    client = http.Client();
+  Future<Map<String, dynamic>> detailPengiriman(String idPengiriman) async {
     late Map<String, dynamic> result;
-    bool _cek_jaringan = await cek_jaringan(client);
-    if (!_cek_jaringan) {
-      result = {
-        'status': 500,
-        'message':
-            "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
-      };
-    } else {
-      // wait for 3 sec
-      // await Future.delayed(Duration(seconds: 3));
-      // result = {'status': 200, 'message': "sini dia"};
+
+    bool _checkServer = await cek_jaringan();
+
+    if (_checkServer) {
       try {
-        var response = await client.get(
+        var response = await http.get(
             Uri.parse(
                 "${globals.http_to_server}api/kurir/detail_pengiriman?username=$username&password=$password&id=$id&id_pengiriman=$idPengiriman"),
             headers: {
@@ -302,39 +421,53 @@ class KurirApi {
             'data': data
           };
         }
+      } on SocketException {
+        // abort the client
+        // closeClient();
+
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on TimeoutException {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on Exception {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
       } catch (e) {
         result = {
           'status': 500,
-          'message':
-              "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
         };
+      } finally {
+        await EasyLoading.dismiss();
       }
+    } else {
+      result = {
+        'status': 500,
+        'message': "Tidak dapat terhubung ke server,koneksi timeout"
+      };
     }
 
     return result;
   }
 
-  static Future<Map<String, dynamic>> mengambilPaketPengiriman(
+  Future<Map<String, dynamic>> mengambilPaketPengiriman(
       String? idPengiriman) async {
-    client = http.Client();
     late Map<String, dynamic> result;
-    bool _cek_jaringan = await cek_jaringan(client);
 
-    // log("cek jaringan : " + _cek_jaringan.toString());
+    bool _checkServer = await cek_jaringan();
 
-    if (!_cek_jaringan) {
-      result = {
-        'status': 500,
-        'message':
-            "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
-      };
-    } else {
-      // wait for 3 sec
-      // await Future.delayed(Duration(seconds: 3));
-      // result = {'status': 200, 'message': "sini dia"};
-
+    if (_checkServer) {
       try {
-        var response = await client.post(
+        var response = await http.post(
             Uri.parse(
                 "${globals.http_to_server}api/kurir/mengambil_paket_pengiriman?username=$username&password=$password&id=$id"),
             headers: {
@@ -362,26 +495,58 @@ class KurirApi {
             'data': data
           };
         }
+      } on SocketException {
+        // abort the client
+        // closeClient();
+
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on TimeoutException {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on Exception {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
       } catch (e) {
         result = {
           'status': 500,
-          'message':
-              "Tidak dapat terhubung ke server, Sila periksa koneksi internet anda"
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
         };
+      } finally {
+        await EasyLoading.dismiss();
       }
+    } else {
+      result = {
+        'status': 500,
+        'message': "Tidak dapat terhubung ke server,koneksi timeout"
+      };
     }
 
     return result;
   }
 
   // checking connection to server
-  static Future<bool> cek_jaringan(http.Client client) async {
+  // ignore: non_constant_identifier_names
+  Future<bool> cek_jaringan() async {
     late bool result;
 
     // client get for globals.http_to_server
+    await EasyLoading.show(
+      status: 'Sedang\nCek\nJaringan\n...',
+      maskType: EasyLoadingMaskType.black,
+    );
+
     try {
       var response =
-          await client.get(Uri.parse("${globals.http_to_server}api"), headers: {
+          await http.get(Uri.parse("${globals.http_to_server}api"), headers: {
         "Accept": "application/json",
         // "authorization":
         //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
@@ -394,22 +559,18 @@ class KurirApi {
         result = false;
       }
     } on SocketException {
-      await EasyLoading.dismiss();
       result = false;
-      await clientClose(client);
-      log(" ini error socket");
+      // await clientClose(client);
     } on TimeoutException {
-      await EasyLoading.dismiss();
       result = false;
       // close client
-      await clientClose(client);
-      log(" ini timeout");
+      // await clientClose(client);
     } on Exception {
       result = false;
-      log(" ini timeout");
     } catch (e) {
       result = false;
-      log(" ini timeout");
+    } finally {
+      await EasyLoading.dismiss();
     }
 
     return result;

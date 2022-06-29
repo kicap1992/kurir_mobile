@@ -626,7 +626,10 @@ class KirimBarangController extends GetxController {
   get_all_kurir(BuildContext context) async {
     _kurirWidget.clear();
     _check_jarak_tempuh();
-    Map<String, dynamic> _dataKurirAll = await PengirimApi.getAllKurir();
+
+    final _api = Get.put(PengirimApi());
+
+    Map<String, dynamic> _dataKurirAll = await _api.getAllKurir();
     // log(_dataKurirAll['status'].toString() + " ini data kurir all");
     kurir_widget(_dataKurirAll, context);
   }
@@ -949,7 +952,8 @@ class KirimBarangController extends GetxController {
     _kurirWidget.clear();
     _check_jarak_tempuh();
 
-    Map<String, dynamic> _dataKurir = await PengirimApi.getKurirByNama(nama);
+    final _api = Get.put(PengirimApi());
+    Map<String, dynamic> _dataKurir = await _api.getKurirByNama(nama);
 
     // log(_dataKurir.toString() + " ini data kurir");
     kurir_widget(_dataKurir, context);
@@ -1107,7 +1111,9 @@ class KirimBarangController extends GetxController {
       maskType: EasyLoadingMaskType.black,
     );
 
-    Map<String, dynamic> _dataKurir = await PengirimApi.getKurirByFilter(
+    final _api = Get.put(PengirimApi());
+
+    Map<String, dynamic> _dataKurir = await _api.getKurirByFilter(
       _namaKurirSearch,
       _biayaMaksimal,
       _biayaPerKm,
@@ -2297,8 +2303,9 @@ class KirimBarangController extends GetxController {
         }
       };
 
-      Map<String, dynamic> _result =
-          await PengirimApi.createPengirimanBarang(_data);
+      final _api = Get.put(PengirimApi());
+
+      Map<String, dynamic> _result = await _api.createPengirimanBarang(_data);
 
       if (_result['status'] == 200) {
         _cek_and_delete();

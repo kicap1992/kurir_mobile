@@ -283,8 +283,11 @@ class PendaftaranPengirimController extends GetxController {
         status: 'Cek Koneksi...',
         maskType: EasyLoadingMaskType.black,
       );
+
+      final _c = Get.put(BeforeLoginApi());
+
       Map<String, dynamic> _inidia =
-          await BeforeLoginApi.sign_up_pengirim(data, fotoProfil);
+          await _c.sign_up_pengirim(data, fotoProfil);
 
       // final Map<String, dynamic> _inidia = await _api.sign_up_pengirim(
       //   data,

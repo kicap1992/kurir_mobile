@@ -4,6 +4,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:kurir/controller/after_login/kurir/logKirimanController.dart';
 
 import 'package:socket_io_client/socket_io_client.dart';
 
@@ -33,6 +34,15 @@ class KurirIndexController extends GetxController {
       case 1:
         final ctrl = Get.put<PengirimanKurirController>(
           PengirimanKurirController(),
+        );
+        ctrl.onInit();
+
+        // Get.put(PengaturanKurirController());
+
+        break;
+      case 2:
+        final ctrl = Get.put<LogKirimanControllerKurir>(
+          LogKirimanControllerKurir(),
         );
         ctrl.onInit();
 

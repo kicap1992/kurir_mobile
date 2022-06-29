@@ -9,11 +9,11 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:intl/intl.dart';
-import 'package:kurir/api/pengirimApi.dart';
-import 'package:kurir/function/allFunction.dart';
-import 'package:kurir/models/pengirimimanModel.dart';
 
-import 'package:kurir/globals.dart' as globals;
+import '../../../api/pengirimApi.dart';
+import '../../../function/allFunction.dart';
+import '../../../globals.dart' as globals;
+import '../../../models/pengirimimanModel.dart';
 
 class LogKirimanController extends GetxController {
   Rx<Widget> widgetLogKiriman = const Center(
@@ -60,7 +60,8 @@ class LogKirimanController extends GetxController {
   }
 
   checkAllLogKiriman() async {
-    Map<String, dynamic> _data = await PengirimApi.getLogKiriman();
+    final _api = Get.put(PengirimApi());
+    Map<String, dynamic> _data = await _api.getLogKiriman();
     // log(_data.toString());
     // await 4 sec
     widgetLogKiriman.value = const Center(
@@ -226,7 +227,9 @@ class LogKirimanController extends GetxController {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      _status,
+                      (_status == 'Mengambil Paket Pengiriman Dari Pengirim')
+                          ? 'Kurir Dalam Perjalanan Mengmabil Paket'
+                          : _status,
                       style: const TextStyle(
                         fontSize: 15,
                         // fontWeight: FontWeight.bold,
@@ -451,7 +454,9 @@ class LogKirimanController extends GetxController {
       );
       _polylines.add(polyline);
 
-      double distance = await PengirimApi.jarak_route(
+      final _api = Get.put(PengirimApi());
+
+      double distance = await _api.jarak_route(
         latLng_permulaan.latitude,
         latLng_permulaan.longitude,
         latLng_pengiriman.latitude,

@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:kurir/function/allFunction.dart';
 
 import '../../../controller/after_login/kurir/pengirimanController.dart';
+import '../../../function/allFunction.dart';
 import '../../../models/pengirimimanModel.dart';
 import '../../../widgets/bounce_scroller.dart';
 import '../../../widgets/boxBackgroundDecoration.dart';
@@ -107,6 +107,10 @@ class _SlidableWidget extends StatelessWidget {
       case "Mengambil Paket Pengiriman Dari Pengirim":
         _text = "Paket Diterima\nDari Pengirim";
         _icon = Icons.handshake_outlined;
+        break;
+      case "Menghantar Paket Pengiriman Ke Penerima":
+        _text = "Paket Diterima\nOleh Penerima";
+        _icon = Icons.person_pin_sharp;
         break;
       default:
     }

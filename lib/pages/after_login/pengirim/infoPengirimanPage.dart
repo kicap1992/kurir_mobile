@@ -7,6 +7,8 @@ import 'package:kurir/controller/after_login/pengirim/infoPengirimanController.d
 import 'package:kurir/widgets/boxBackgroundDecoration.dart';
 import 'package:kurir/widgets/ourContainer.dart';
 
+import '../../../widgets/appbar.dart';
+
 class InfoPengirimanPage extends GetView<InfoPengirimanController> {
   const InfoPengirimanPage({Key? key}) : super(key: key);
 
@@ -14,35 +16,56 @@ class InfoPengirimanPage extends GetView<InfoPengirimanController> {
   Widget build(BuildContext context) {
     // String _harga_minimal = AllFunction.thousandsSeperator(
     //     controller.pengirimanModel.biaya!.biayaMinimal!);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Info Pengiriman'),
-        actions: [
-          // create back button
-          IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Get.offAllNamed(
-                '/pengirimIndex',
-                arguments: {
-                  'tap': 1,
-                },
-              );
-            },
+    return WillPopScope(
+      onWillPop: () async {
+        Get.offAllNamed(
+          '/pengirimIndex',
+          arguments: {
+            'tap': 1,
+          },
+        );
+        return false;
+      },
+      child: Scaffold(
+        appBar: PreferredSize(
+          preferredSize:
+              Size.fromHeight(MediaQuery.of(context).size.height * 0.08),
+          child: AppBarWidget(
+            header: "Info Pengiriman",
+            autoLeading: true,
+            actions: [
+              // create back button
+              if (controller.pengirimanModel.statusPengiriman ==
+                  'Mengambil Paket Pengiriman Dari Pengirim')
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.qr_code_2_outlined,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+
+              if (controller.pengirimanModel.statusPengiriman ==
+                  'Mengambil Paket Pengiriman Dari Pengirim')
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {},
+                      icon: const Icon(
+                        Icons.motorcycle_outlined,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+            ],
           ),
-        ],
-      ),
-      body: WillPopScope(
-        onWillPop: () async {
-          Get.offAllNamed(
-            '/pengirimIndex',
-            arguments: {
-              'tap': 1,
-            },
-          );
-          return false;
-        },
-        child: BoxBackgroundDecoration(
+        ),
+        body: BoxBackgroundDecoration(
           child: SingleChildScrollView(
             child: Column(
               children: [
@@ -73,196 +96,80 @@ class InfoPengirimanPage extends GetView<InfoPengirimanController> {
                               ),
                             ],
                           ),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(100),
-                              image: const DecorationImage(
-                                image: AssetImage(
-                                  'assets/loading.gif',
-                                ),
-                                fit: BoxFit.fill,
-                              ),
-                            ),
-                            child: (controller.pengirimanModel.fotoPengiriman !=
-                                    null)
-                                ? Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(100),
-                                      image: DecorationImage(
-                                        image: NetworkImage(
-                                          controller
-                                              .pengirimanModel.fotoPengiriman!,
-                                        ),
-                                        fit: BoxFit.fill,
-                                      ),
-                                    ),
-                                  )
-                                : const SizedBox(),
+                          child: _FotoWidget(controller: controller),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      _ThisTextFormField(
+                        text: (controller.pengirimanModel.statusPengiriman ==
+                                'Mengambil Paket Pengiriman Dari Pengirim')
+                            ? 'Kurir Dalam Perjalanan Mengmabil Paket'
+                            : controller.pengirimanModel.statusPengiriman!,
+                        maxLines: 2,
+                        label: "Status Pengiriman",
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      _ThisTextFormField(
+                          text: controller.pengirimanModel.namaPenerima!,
+                          label: 'Nama Penerima'),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      _ThisTextFormField(
+                          text: controller.pengirimanModel.noTelponPenerima!,
+                          label: 'No Telpon Penerima'),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      _ThisTextFormField(
+                          text: controller.pengirimanModel.alamatPenerima!,
+                          label: 'Alamat Penerima',
+                          maxLines: 4),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      _ThisTextFormField(
+                        text: controller.pengirimanModel.kurir!.nama!,
+                        label: 'Nama Kurir',
+                        suffix: GestureDetector(
+                          onTap: () {
+                            // dev.log("message");
+                            if (controller.loadingMaps.value)
+                              controller.show_kurir_dialog();
+                          },
+                          child: const Icon(
+                            Icons.info_outline_rounded,
+                            color: Color.fromARGB(255, 104, 164, 164),
                           ),
                         ),
                       ),
                       const SizedBox(
                         height: 15,
                       ),
-                      TextFormField(
-                        readOnly: true,
-                        initialValue:
-                            controller.pengirimanModel.statusPengiriman,
-                        decoration: InputDecoration(
-                          labelStyle: const TextStyle(
-                            color: Colors.blue,
-                          ),
-                          labelText: 'Status Pengiriman',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      TextFormField(
-                        readOnly: true,
-                        initialValue: controller.pengirimanModel.namaPenerima,
-                        decoration: InputDecoration(
-                          labelStyle: const TextStyle(
-                            color: Colors.blue,
-                          ),
-                          labelText: 'Nama Penerima',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      TextFormField(
-                        readOnly: true,
-                        initialValue:
-                            controller.pengirimanModel.noTelponPenerima,
-                        // maxLength: 13,
-                        decoration: InputDecoration(
-                          labelStyle: const TextStyle(
-                            color: Colors.blue,
-                          ),
-                          labelText: 'No Telpon Penerima',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      TextFormField(
-                        readOnly: true,
-                        initialValue: controller.pengirimanModel.alamatPenerima,
-                        keyboardType: TextInputType.multiline,
-                        textInputAction: TextInputAction.newline,
-                        // minLines: 1,
-                        maxLines: 4,
-                        decoration: InputDecoration(
-                          labelText: 'Alamat Penerima',
-                          labelStyle: const TextStyle(
-                            color: Colors.blue,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      TextFormField(
-                        readOnly: true,
-                        initialValue: controller.pengirimanModel.kurir!.nama,
-                        // maxLength: 13,
-                        decoration: InputDecoration(
-                          labelStyle: const TextStyle(
-                            color: Colors.blue,
-                          ),
-                          suffix: GestureDetector(
-                            onTap: () {
-                              // dev.log("message");
-                              if (controller.loadingMaps.value)
-                                controller.show_kurir_dialog();
-                            },
-                            child: const Icon(
-                              Icons.info_outline_rounded,
-                              color: Colors.blue,
-                            ),
-                          ),
-                          labelText: 'Nama Kurir',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      TextFormField(
-                        readOnly: true,
+                      _ThisTextFormField(
                         controller: controller.distance_travel_controller,
-                        decoration: InputDecoration(
-                          labelStyle: const TextStyle(
-                            color: Colors.blue,
-                          ),
-                          labelText: 'Jarak Pengiriman',
-                          suffixIcon: GestureDetector(
-                            onTap: () {
-                              if (controller.loadingMaps.value)
-                                controller.show_maps_dialog();
-                            },
-                            child: const Icon(
-                              Icons.info_outline_rounded,
-                              color: Colors.blue,
-                            ),
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: Colors.grey,
-                            ),
+                        label: 'Jarak Pengiriman',
+                        suffix: GestureDetector(
+                          onTap: () {
+                            if (controller.loadingMaps.value)
+                              controller.show_maps_dialog();
+                          },
+                          child: const Icon(
+                            Icons.info_outline_rounded,
+                            color: Color.fromARGB(255, 104, 164, 164),
                           ),
                         ),
                       ),
                       const SizedBox(
                         height: 15,
                       ),
-                      TextFormField(
-                        readOnly: true,
-                        controller: controller.price_controller,
-                        decoration: InputDecoration(
-                          labelStyle: const TextStyle(
-                            color: Colors.blue,
-                          ),
-                          labelText: 'Harga Pengiriman',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                            borderSide: const BorderSide(
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
-                      ),
+                      _ThisTextFormField(
+                          label: 'Harga Pengiriman',
+                          controller: controller.price_controller),
                       const SizedBox(
                         height: 15,
                       ),
@@ -272,12 +179,18 @@ class InfoPengirimanPage extends GetView<InfoPengirimanController> {
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   primary: Colors.red,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
                                 ),
                                 child: const Text("Batalkan Pengiriman"),
                                 onPressed: () {},
                               ),
                             )
-                          : const SizedBox(),
+                          : (controller.pengirimanModel.statusPengiriman ==
+                                  "Mengambil Paket Pengiriman Dari Pengirim")
+                              ? const _ButtonKurirDalamPerjalan()
+                              : const SizedBox(),
                     ],
                   ),
                 ),
@@ -286,6 +199,151 @@ class InfoPengirimanPage extends GetView<InfoPengirimanController> {
                 ),
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ButtonKurirDalamPerjalan extends StatelessWidget {
+  const _ButtonKurirDalamPerjalan({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: const Color.fromARGB(255, 2, 72, 72),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text("Scan QR Code"),
+            onPressed: () {},
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              primary: const Color.fromARGB(255, 2, 72, 72),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: const Text("Lokasi Kurir"),
+            onPressed: () {},
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _FotoWidget extends StatelessWidget {
+  const _FotoWidget({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
+
+  final InfoPengirimanController controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(100),
+        image: const DecorationImage(
+          image: AssetImage(
+            'assets/loading.gif',
+          ),
+          fit: BoxFit.fill,
+        ),
+      ),
+      child: (controller.pengirimanModel.fotoPengiriman != null)
+          ? Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(100),
+                image: DecorationImage(
+                  image: NetworkImage(
+                    controller.pengirimanModel.fotoPengiriman!,
+                  ),
+                  fit: BoxFit.fill,
+                  onError: (object, stacktrace) {
+                    // print(e);
+                  },
+                ),
+              ),
+            )
+          : const SizedBox(),
+    );
+  }
+}
+
+class _ThisTextFormField extends StatelessWidget {
+  const _ThisTextFormField({
+    Key? key,
+    this.text,
+    this.maxLines = 1,
+    required this.label,
+    this.suffix,
+    this.controller,
+  }) : super(key: key);
+
+  final String? text;
+  final String label;
+  final int maxLines;
+  final Widget? suffix;
+  final TextEditingController? controller;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      maxLines: maxLines,
+      readOnly: true,
+      initialValue: text,
+      decoration: InputDecoration(
+        labelStyle: const TextStyle(
+          color: Color.fromARGB(255, 4, 103, 103),
+        ),
+        labelText: label,
+        suffix: suffix,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(
+            color: Color.fromARGB(255, 2, 72, 72),
+          ),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(
+            color: Color.fromARGB(255, 2, 72, 72),
+            width: 1,
+          ),
+        ),
+        disabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(
+            color: Color.fromARGB(255, 104, 164, 164),
+            width: 1,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(
+            color: Color.fromARGB(255, 2, 72, 72),
+            width: 1,
+          ),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(30),
+          borderSide: const BorderSide(
+            color: Colors.red,
+            width: 1,
           ),
         ),
       ),

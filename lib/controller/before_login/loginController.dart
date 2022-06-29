@@ -142,7 +142,9 @@ class LoginController extends GetxController {
     log(_password.toString() + " ini passwordnya");
     log(_role.toString() + " ini role nya");
 
-    Map<String, dynamic> _data = await BeforeLoginApi.log_in_user(
+    final _c = Get.put(BeforeLoginApi());
+
+    Map<String, dynamic> _data = await _c.log_in_user(
         _username, generateMd5(_password), _role.toLowerCase());
 
     await EasyLoading.dismiss();

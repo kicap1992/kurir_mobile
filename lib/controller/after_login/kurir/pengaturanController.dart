@@ -49,7 +49,10 @@ class PengaturanKurirController extends GetxController {
       status: 'Loading Data...',
       maskType: EasyLoadingMaskType.black,
     );
-    final result = await KurirApi.cekPengaturanKurir();
+
+    final _api = Get.put(KurirApi());
+
+    final result = await _api.cekPengaturanKurir();
 
     log(result.toString());
     if (result['status'] == 200 && result['data'] != null) {
@@ -88,7 +91,9 @@ class PengaturanKurirController extends GetxController {
       status: 'Pengaturan Biaya...',
       maskType: EasyLoadingMaskType.black,
     );
-    final result = await KurirApi.pengaturanKurir(
+
+    final _api = Get.put(KurirApi());
+    final result = await _api.pengaturanKurir(
         minimalBiayaPengiriman, maksimalBiayaPengiriman, biayaPerKilo);
 
     log(result.toString());
