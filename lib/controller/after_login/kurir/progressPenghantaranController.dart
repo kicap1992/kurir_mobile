@@ -201,7 +201,9 @@ class ProgressPenghantaranControllerKurir extends GetxController {
 
   Future<void> onQRViewCreated(BuildContext context, String aksinya) async {
     Get.dialog(
-      QRcodeScannerWidget(),
+      QRcodeScannerWidget(
+        title: aksinya,
+      ),
     );
   }
 }
@@ -209,7 +211,10 @@ class ProgressPenghantaranControllerKurir extends GetxController {
 class QRcodeScannerWidget extends StatefulWidget {
   const QRcodeScannerWidget({
     Key? key,
+    required this.title,
   }) : super(key: key);
+
+  final String title;
 
   @override
   State<QRcodeScannerWidget> createState() => _QRcodeScannerWidgetState();
@@ -225,8 +230,8 @@ class _QRcodeScannerWidgetState extends State<QRcodeScannerWidget> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: Color.fromARGB(255, 199, 214, 234),
-      title: const Text("Scan QRCode"),
+      backgroundColor: const Color.fromARGB(255, 199, 214, 234),
+      title: Text("Scan QRCode ${widget.title}"),
       content: SizedBox(
         width: 250, // custom wrap size
         height: 250,
@@ -243,17 +248,7 @@ class _QRcodeScannerWidgetState extends State<QRcodeScannerWidget> {
               setState(() {
                 _isScanning = false;
               });
-              Get.snackbar(
-                "Success",
-                "QRCode berhasil ditambahkan",
-                snackPosition: SnackPosition.TOP,
-                backgroundColor: Colors.green,
-                borderRadius: 10,
-                margin: EdgeInsets.all(10),
-                borderColor: Colors.green,
-                borderWidth: 2,
-                duration: Duration(seconds: 2),
-              );
+              dev.i("scanner berhasil");
             } else {
               setState(() {
                 _isScanning = false;

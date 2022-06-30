@@ -1,13 +1,14 @@
 // ignore_for_file: file_names
 
 import 'dart:async';
-import 'dart:convert';
+// import 'dart:convert';
 
 import 'dart:io';
+import 'package:dio/dio.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import '../globals.dart' as globals;
 
@@ -19,6 +20,13 @@ class KurirApi extends GetxController {
   static var username = storage.read("username");
   static var password = storage.read("password");
   static var id = storage.read("id");
+
+  static var options = BaseOptions(
+    // baseUrl: 'https://www.xx.com/api',
+    connectTimeout: 10000,
+    receiveTimeout: 10000,
+  );
+  Dio dio = Dio(options);
 
   // get all pengiriman status ='Dalam Pengesahan Kurir'
   Future<Map<String, dynamic>> getAllPengirimanDalamPengesahanKurir() async {
@@ -33,16 +41,27 @@ class KurirApi extends GetxController {
           maskType: EasyLoadingMaskType.black,
         );
 
-        var response = await http.get(
-            Uri.parse(
-                "${globals.http_to_server}api/kurir/pengiriman_kurir_dalam_pengesahan?username=$username&password=$password&id=$id"),
-            headers: {
-              "Accept": "application/json",
-              // "authorization":
-              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-              "crossDomain": "true"
-            }).timeout(const Duration(seconds: 10));
-        final data = jsonDecode(response.body);
+        // var response = await http.get(
+        //     Uri.parse(
+        //         "${globals.http_to_server}api/kurir/pengiriman_kurir_dalam_pengesahan?username=$username&password=$password&id=$id"),
+        //     headers: {
+        //       "Accept": "application/json",
+        //       // "authorization":
+        //       //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+        //       "crossDomain": "true"
+        //     }).timeout(const Duration(seconds: 10));
+        var response = await dio.get(
+            "${globals.http_to_server}api/kurir/pengiriman_kurir_dalam_pengesahan?username=$username&password=$password&id=$id",
+            options: Options(
+              headers: {
+                "Accept": "application/json",
+                // "authorization":
+                //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+                "crossDomain": "true"
+              },
+            ));
+
+        final data = response.data;
         // log(data.toString());
         // log("ini status : " + response.statusCode.toString());
         if (response.statusCode == 200) {
@@ -105,16 +124,27 @@ class KurirApi extends GetxController {
           maskType: EasyLoadingMaskType.black,
         );
 
-        var response = await http.get(
-            Uri.parse(
-                "${globals.http_to_server}api/kurir/pengiriman_completed?username=$username&password=$password&id=$id"),
-            headers: {
-              "Accept": "application/json",
-              // "authorization":
-              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-              "crossDomain": "true"
-            }).timeout(const Duration(seconds: 10));
-        final data = jsonDecode(response.body);
+        // var response = await http.get(
+        //     Uri.parse(
+        //         "${globals.http_to_server}api/kurir/pengiriman_completed?username=$username&password=$password&id=$id"),
+        //     headers: {
+        //       "Accept": "application/json",
+        //       // "authorization":
+        //       //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+        //       "crossDomain": "true"
+        //     }).timeout(const Duration(seconds: 10));
+        var response = await dio.get(
+            "${globals.http_to_server}api/kurir/pengiriman_completed?username=$username&password=$password&id=$id",
+            options: Options(
+              headers: {
+                "Accept": "application/json",
+                // "authorization":
+                //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+                "crossDomain": "true"
+              },
+            ));
+
+        final data = response.data;
         // log(data.toString());
         // log("ini status : " + response.statusCode.toString());
         if (response.statusCode == 200) {
@@ -177,16 +207,27 @@ class KurirApi extends GetxController {
       );
 
       try {
-        var response = await http.get(
-            Uri.parse(
-                "${globals.http_to_server}api/kurir/pengaturan?username=$username&password=$password&id=$id"),
-            headers: {
-              "Accept": "application/json",
-              // "authorization":
-              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-              "crossDomain": "true"
-            }).timeout(const Duration(seconds: 10));
-        final data = jsonDecode(response.body);
+        // var response = await http.get(
+        //     Uri.parse(
+        //         "${globals.http_to_server}api/kurir/pengaturan?username=$username&password=$password&id=$id"),
+        //     headers: {
+        //       "Accept": "application/json",
+        //       // "authorization":
+        //       //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+        //       "crossDomain": "true"
+        //     }).timeout(const Duration(seconds: 10));
+        var response = await dio.get(
+            "${globals.http_to_server}api/kurir/pengaturan?username=$username&password=$password&id=$id",
+            options: Options(
+              headers: {
+                "Accept": "application/json",
+                // "authorization":
+                //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+                "crossDomain": "true"
+              },
+            ));
+
+        final data = response.data;
         if (response.statusCode == 200) {
           result = {
             'status': 200,
@@ -251,21 +292,38 @@ class KurirApi extends GetxController {
           status: 'Loading...',
           maskType: EasyLoadingMaskType.black,
         );
-        var response = await http.post(
-            Uri.parse(
-                "${globals.http_to_server}api/kurir/pengaturan?username=$username&password=$password&id=$id"),
-            headers: {
-              "Accept": "application/json",
-              // "authorization":
-              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-              "crossDomain": "true"
-            },
-            body: {
+        // var response = await http.post(
+        //     Uri.parse(
+        //         "${globals.http_to_server}api/kurir/pengaturan?username=$username&password=$password&id=$id"),
+        //     headers: {
+        //       "Accept": "application/json",
+        //       // "authorization":
+        //       //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+        //       "crossDomain": "true"
+        //     },
+        //     body: {
+        //       "minimal_biaya_pengiriman": minimalBiaya,
+        //       "maksimal_biaya_pengiriman": maksimalBiaya,
+        //       "biaya_per_kilo": biayaPerKilo
+        //     }).timeout(const Duration(seconds: 10));
+        // final data = jsonDecode(response.body);
+        var response = await dio.post(
+            "${globals.http_to_server}api/kurir/pengaturan?username=$username&password=$password&id=$id",
+            options: Options(
+              headers: {
+                "Accept": "application/json",
+                // "authorization":
+                //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+                "crossDomain": "true"
+              },
+            ),
+            data: {
               "minimal_biaya_pengiriman": minimalBiaya,
               "maksimal_biaya_pengiriman": maksimalBiaya,
               "biaya_per_kilo": biayaPerKilo
-            }).timeout(const Duration(seconds: 10));
-        final data = jsonDecode(response.body);
+            });
+        final data = response.data;
+
         if (response.statusCode == 200) {
           result = {'status': 200, 'message': data['message'], 'data': data};
         } else {
@@ -321,19 +379,32 @@ class KurirApi extends GetxController {
 
     if (_checkServer) {
       try {
-        var response = await http.post(
-            Uri.parse(
-                "${globals.http_to_server}api/kurir/sahkan_pengiriman?username=$username&password=$password&id=$id"),
-            headers: {
-              "Accept": "application/json",
-              // "authorization":
-              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-              "crossDomain": "true"
-            },
-            body: {
-              "id_pengiriman": idPengiriman
-            }).timeout(const Duration(seconds: 60));
-        final data = jsonDecode(response.body);
+        // var response = await http.post(
+        //     Uri.parse(
+        //         "${globals.http_to_server}api/kurir/sahkan_pengiriman?username=$username&password=$password&id=$id"),
+        //     headers: {
+        //       "Accept": "application/json",
+        //       // "authorization":
+        //       //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+        //       "crossDomain": "true"
+        //     },
+        //     body: {
+        //       "id_pengiriman": idPengiriman
+        //     }).timeout(const Duration(seconds: 60));
+        // final data = jsonDecode(response.body);
+        var response = await dio.post(
+            "${globals.http_to_server}api/kurir/sahkan_pengiriman?username=$username&password=$password&id=$id",
+            options: Options(
+              headers: {
+                "Accept": "application/json",
+                // "authorization":
+                //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+                "crossDomain": "true"
+              },
+            ),
+            data: {"id_pengiriman": idPengiriman});
+        final data = response.data;
+
         // log(data.toString());
         // log("ini status : " + response.statusCode.toString());
         if (response.statusCode == 200) {
@@ -394,16 +465,29 @@ class KurirApi extends GetxController {
 
     if (_checkServer) {
       try {
-        var response = await http.get(
-            Uri.parse(
-                "${globals.http_to_server}api/kurir/detail_pengiriman?username=$username&password=$password&id=$id&id_pengiriman=$idPengiriman"),
-            headers: {
-              "Accept": "application/json",
-              // "authorization":
-              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-              "crossDomain": "true"
-            }).timeout(const Duration(seconds: 60));
-        final data = jsonDecode(response.body);
+        // var response = await http.get(
+        //     Uri.parse(
+        //         "${globals.http_to_server}api/kurir/detail_pengiriman?username=$username&password=$password&id=$id&id_pengiriman=$idPengiriman"),
+        //     headers: {
+        //       "Accept": "application/json",
+        //       // "authorization":
+        //       //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+        //       "crossDomain": "true"
+        //     }).timeout(const Duration(seconds: 60));
+        // final data = jsonDecode(response.body);
+
+        var response = await dio.get(
+            "${globals.http_to_server}api/kurir/detail_pengiriman?username=$username&password=$password&id=$id&id_pengiriman=$idPengiriman",
+            options: Options(
+              headers: {
+                "Accept": "application/json",
+                // "authorization":
+                //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+                "crossDomain": "true"
+              },
+            ));
+
+        final data = response.data;
         // log(data.toString());
         // log("ini status : " + response.statusCode.toString());
         if (response.statusCode == 200) {
@@ -465,19 +549,31 @@ class KurirApi extends GetxController {
 
     if (_checkServer) {
       try {
-        var response = await http.post(
-            Uri.parse(
-                "${globals.http_to_server}api/kurir/mengambil_paket_pengiriman?username=$username&password=$password&id=$id"),
-            headers: {
-              "Accept": "application/json",
-              // "authorization":
-              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-              "crossDomain": "true"
-            },
-            body: {
-              "id_pengiriman": idPengiriman
-            }).timeout(const Duration(seconds: 60));
-        final data = jsonDecode(response.body);
+        // var response = await http.post(
+        //     Uri.parse(
+        //         "${globals.http_to_server}api/kurir/mengambil_paket_pengiriman?username=$username&password=$password&id=$id"),
+        //     headers: {
+        //       "Accept": "application/json",
+        //       // "authorization":
+        //       //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+        //       "crossDomain": "true"
+        //     },
+        //     body: {
+        //       "id_pengiriman": idPengiriman
+        //     }).timeout(const Duration(seconds: 60));
+        // final data = jsonDecode(response.body);
+        var response = await dio.post(
+            "${globals.http_to_server}api/kurir/mengambil_paket_pengiriman?username=$username&password=$password&id=$id",
+            options: Options(
+              headers: {
+                "Accept": "application/json",
+                // "authorization":
+                //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+                "crossDomain": "true"
+              },
+            ),
+            data: {"id_pengiriman": idPengiriman});
+        final data = response.data;
         // log(data.toString());
         // log("ini status : " + response.statusCode.toString());
         if (response.statusCode == 200) {
@@ -543,13 +639,22 @@ class KurirApi extends GetxController {
     );
 
     try {
-      var response =
-          await http.get(Uri.parse("${globals.http_to_server}api"), headers: {
-        "Accept": "application/json",
-        // "authorization":
-        //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-        "crossDomain": "true"
-      }).timeout(const Duration(seconds: 10));
+      // var response =
+      //     await http.get(Uri.parse("${globals.http_to_server}api"), headers: {
+      //   "Accept": "application/json",
+      //   // "authorization":
+      //   //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+      //   "crossDomain": "true"
+      // }).timeout(const Duration(seconds: 10));
+      var response = await dio.get("${globals.http_to_server}api",
+          options: Options(
+            headers: {
+              "Accept": "application/json",
+              // "authorization":
+              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+              "crossDomain": "true"
+            },
+          ));
       // final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
         result = true;
@@ -581,17 +686,28 @@ class KurirApi extends GetxController {
 
     if (_checkServer) {
       try {
-        var response = await http.get(
-            Uri.parse(
-                "${globals.http_to_server}api/kurir/profil_kurir?username=$username&password=$password&id=$id"),
-            headers: {
-              "Accept": "application/json",
-              // "authorization":
-              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-              "crossDomain": "true"
-            }).timeout(const Duration(seconds: 10));
+        // var response = await http.get(
+        //     Uri.parse(
+        //         "${globals.http_to_server}api/kurir/profil_kurir?username=$username&password=$password&id=$id"),
+        //     headers: {
+        //       "Accept": "application/json",
+        //       // "authorization":
+        //       //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+        //       "crossDomain": "true"
+        //     }).timeout(const Duration(seconds: 10));
 
-        final data = jsonDecode(response.body);
+        // final data = jsonDecode(response.body);
+        var response = await dio.get(
+            "${globals.http_to_server}api/kurir/profil_kurir?username=$username&password=$password&id=$id",
+            options: Options(
+              headers: {
+                "Accept": "application/json",
+                // "authorization":
+                //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+                "crossDomain": "true"
+              },
+            ));
+        final data = response.data;
         dev.i(data);
         if (response.statusCode == 200) {
           result = {

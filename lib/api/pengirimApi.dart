@@ -4,14 +4,15 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:get/get.dart';
+// import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import '../globals.dart' as globals;
 
-class PengirimApi extends GetxController {
+class PengirimApi {
   static var storage = GetStorage();
 
   static var username = storage.read("username");
@@ -19,6 +20,13 @@ class PengirimApi extends GetxController {
   static var id = storage.read("id");
 
   final log = Logger();
+
+  static var options = BaseOptions(
+    // baseUrl: 'https://www.xx.com/api',
+    connectTimeout: 5000,
+    receiveTimeout: 5000,
+  );
+  Dio dio = Dio(options);
 
   // get all kurir
   Future<Map<String, dynamic>> getAllKurir() async {
@@ -32,16 +40,21 @@ class PengirimApi extends GetxController {
         maskType: EasyLoadingMaskType.black,
       );
       try {
-        var response = await http.get(
-            Uri.parse(
-                "${globals.http_to_server}api/pengirim/kurir?username=$username&password=$password&id=$id"),
-            headers: {
-              "Accept": "application/json",
-              // "authorization":
-              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-              "crossDomain": "true"
-            }).timeout(const Duration(seconds: 10));
-        final data = jsonDecode(response.body);
+        // var response = await http.get(
+        //     Uri.parse(
+        //         "${globals.http_to_server}api/pengirim/kurir?username=$username&password=$password&id=$id"),
+        //     headers: {
+        //       "Accept": "application/json",
+        //       // "authorization":
+        //       //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+        //       "crossDomain": "true"
+        //     }).timeout(const Duration(seconds: 10));
+        // final data = jsonDecode(response.body);
+        var response = await dio.get(
+            "${globals.http_to_server}api/pengirim/kurir?username=$username&password=$password&id=$id");
+
+        var data = response.data;
+
         // log(data.toString());
         // log("ini status : " + response.statusCode.toString());
         if (response.statusCode == 200) {
@@ -113,16 +126,20 @@ class PengirimApi extends GetxController {
           status: 'Loading...',
           maskType: EasyLoadingMaskType.black,
         );
-        var response = await http.get(
-            Uri.parse(
-                "${globals.http_to_server}api/pengirim/kurir/nama?nama=$nama&username=$username&password=$password&id=$id"),
-            headers: {
-              "Accept": "application/json",
-              // "authorization":
-              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-              "crossDomain": "true"
-            }).timeout(const Duration(seconds: 10));
-        final data = jsonDecode(response.body);
+        // var response = await http.get(
+        //     Uri.parse(
+        //         "${globals.http_to_server}api/pengirim/kurir/nama?nama=$nama&username=$username&password=$password&id=$id"),
+        //     headers: {
+        //       "Accept": "application/json",
+        //       // "authorization":
+        //       //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+        //       "crossDomain": "true"
+        //     }).timeout(const Duration(seconds: 10));
+        // final data = jsonDecode(response.body);
+
+        var response = await dio.get(
+            "${globals.http_to_server}api/pengirim/kurir/nama?nama=$nama&username=$username&password=$password&id=$id");
+        var data = response.data;
         // log(data.toString());
         // log("ini status : " + response.statusCode.toString());
         if (response.statusCode == 200) {
@@ -199,16 +216,20 @@ class PengirimApi extends GetxController {
         String _biayaMaksimal = biayaMaksimal?.toString() ?? "";
         String _biayaPerKm = biayaPerKm?.toString() ?? "";
 
-        var response = await http.get(
-            Uri.parse(
-                "${globals.http_to_server}api/pengirim/kurir/filter?nama=$_nama&biaya_maksimal=$_biayaMaksimal&biaya_per_km=$_biayaPerKm&username=$username&password=$password&id=$id"),
-            headers: {
-              "Accept": "application/json",
-              // "authorization":
-              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-              "crossDomain": "true"
-            }).timeout(const Duration(seconds: 10));
-        final data = jsonDecode(response.body);
+        // var response = await http.get(
+        //     Uri.parse(
+        //         "${globals.http_to_server}api/pengirim/kurir/filter?nama=$_nama&biaya_maksimal=$_biayaMaksimal&biaya_per_km=$_biayaPerKm&username=$username&password=$password&id=$id"),
+        //     headers: {
+        //       "Accept": "application/json",
+        //       // "authorization":
+        //       //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+        //       "crossDomain": "true"
+        //     }).timeout(const Duration(seconds: 10));
+        // final data = jsonDecode(response.body);
+
+        var response = await dio.get(
+            "${globals.http_to_server}api/pengirim/kurir/filter?nama=$_nama&biaya_maksimal=$_biayaMaksimal&biaya_per_km=$_biayaPerKm&username=$username&password=$password&id=$id");
+        var data = response.data;
         // log(data.toString());
         // log("ini status : " + response.statusCode.toString());
         if (response.statusCode == 200) {
@@ -285,18 +306,28 @@ class PengirimApi extends GetxController {
         // log(foto_path.toString() + " ini datanya di pengiriman barang");
         // remove foto_path from _datanya
         _datanya.remove('foto_path');
-        var postUri = Uri.parse(
-            '${globals.http_to_server}api/pengirim/pengiriman_barang?username=$username&password=$password&id=$id');
-        var request = http.MultipartRequest("POST", postUri);
-        request.fields['data'] = jsonEncode(_datanya);
-        request.files.add(
-            await http.MultipartFile.fromPath('foto_pengiriman', foto_path));
-        var streamResponse =
-            await request.send().timeout(const Duration(seconds: 60));
-        // var streamResponse = await request.send();
-        var response = await http.Response.fromStream(streamResponse);
+        // var postUri = Uri.parse(
+        //     '${globals.http_to_server}api/pengirim/pengiriman_barang?username=$username&password=$password&id=$id');
+        // var request = http.MultipartRequest("POST", postUri);
+        // request.fields['data'] = jsonEncode(_datanya);
+        // request.files.add(
+        //     await http.MultipartFile.fromPath('foto_pengiriman', foto_path));
+        // var streamResponse =
+        //     await request.send().timeout(const Duration(seconds: 60));
+        // // var streamResponse = await request.send();
+        // var response = await http.Response.fromStream(streamResponse);
 
-        var datanya = jsonDecode(response.body);
+        // var datanya = jsonDecode(response.body);
+        var formData = FormData.fromMap({
+          "data": jsonEncode(_datanya),
+          "foto_pengiriman": await MultipartFile.fromFile(foto_path),
+        });
+
+        var response = await dio.post(
+            "${globals.http_to_server}api/pengirim/pengiriman_barang?username=$username&password=$password&id=$id",
+            data: formData);
+
+        var datanya = response.data;
 
         result = {
           'status': 200,
@@ -353,16 +384,21 @@ class PengirimApi extends GetxController {
 
     if (_checkServer) {
       try {
-        var response = await http.get(
-            Uri.parse(
-                "${globals.http_to_server}api/pengirim/log_kiriman?username=$username&password=$password&id=$id"),
-            headers: {
-              "Accept": "application/json",
-              // "authorization":
-              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-              "crossDomain": "true"
-            }).timeout(const Duration(seconds: 10));
-        final data = jsonDecode(response.body);
+        // var response = await http.get(
+        //     Uri.parse(
+        //         "${globals.http_to_server}api/pengirim/log_kiriman?username=$username&password=$password&id=$id"),
+        //     headers: {
+        //       "Accept": "application/json",
+        //       // "authorization":
+        //       //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+        //       "crossDomain": "true"
+        //     }).timeout(const Duration(seconds: 10));
+        // final data = jsonDecode(response.body);
+
+        var response = await dio.get(
+            "${globals.http_to_server}api/pengirim/log_kiriman?username=$username&password=$password&id=$id");
+        var data = response.data;
+
         // log(data.toString());
         if (response.statusCode == 200) {
           result = {
@@ -421,18 +457,22 @@ class PengirimApi extends GetxController {
     double jarak = 0;
 
     try {
-      var response = await http.get(
-          Uri.parse(
-              "https://maps.googleapis.com/maps/api/directions/json?origin=$lat1,$lng1&destination=$lat2,$lng2&key=${globals.api_key}"),
-          headers: {
-            "Accept": "application/json",
-            // "authorization":
-            //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-            "crossDomain": "true"
-          }).timeout(const Duration(seconds: 10));
+      // var response = await http.get(
+      //     Uri.parse(
+      //         "https://maps.googleapis.com/maps/api/directions/json?origin=$lat1,$lng1&destination=$lat2,$lng2&key=${globals.api_key}"),
+      //     headers: {
+      //       "Accept": "application/json",
+      //       // "authorization":
+      //       //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+      //       "crossDomain": "true"
+      //     }).timeout(const Duration(seconds: 10));
 
       // log()
-      final data = jsonDecode(response.body);
+      // final data = jsonDecode(response.body);
+
+      var response = await dio.get(
+          "https://maps.googleapis.com/maps/api/directions/json?origin=$lat1,$lng1&destination=$lat2,$lng2&key=${globals.api_key}");
+      var data = response.data;
 
       if (data["routes"].length > 0) {
         jarak = data["routes"][0]["legs"][0]["distance"]["value"] / 1000;
@@ -457,13 +497,15 @@ class PengirimApi extends GetxController {
     );
 
     try {
-      var response =
-          await http.get(Uri.parse("${globals.http_to_server}api"), headers: {
-        "Accept": "application/json",
-        // "authorization":
-        //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-        "crossDomain": "true"
-      }).timeout(const Duration(seconds: 10));
+      // var response =
+      //     await http.get(Uri.parse("${globals.http_to_server}api"), headers: {
+      //   "Accept": "application/json",
+      //   // "authorization":
+      //   //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+      //   "crossDomain": "true"
+      // }).timeout(const Duration(seconds: 10));
+
+      var response = await dio.get("${globals.http_to_server}api");
       // final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
         result = true;

@@ -3,17 +3,27 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+// import 'dart:convert';
+// import 'dart:io';
 
+import 'package:dio/dio.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:get/get.dart';
+// import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
-import 'package:http/http.dart' as http;
+// import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import '../globals.dart' as globals;
 
-class BeforeLoginApi extends GetxController {
+class BeforeLoginApi {
   static final log = Logger();
   static var storage = GetStorage();
+
+  static var options = BaseOptions(
+    // baseUrl: 'https://www.xx.com/api',
+    connectTimeout: 5000,
+    receiveTimeout: 5000,
+  );
+  Dio dio = Dio(options);
 
   Future<Map<String, dynamic>> sign_up_kurir(Map data, String fotoKTP,
       String fotoHoldingKTP, String fotoKendaraan, String fotoProfil) async {
@@ -27,24 +37,44 @@ class BeforeLoginApi extends GetxController {
           status: 'Melakukan\nPendaftaran...',
           maskType: EasyLoadingMaskType.black,
         );
-        var postUri = Uri.parse('${globals.http_to_server}api/login/daftar1');
-        var request = http.MultipartRequest("POST", postUri);
-        request.fields['data'] = jsonEncode(data);
-        request.files
-            .add(await http.MultipartFile.fromPath('ktp_photo', fotoKTP));
-        request.files.add(await http.MultipartFile.fromPath(
-            'ktp_holding_photo', fotoHoldingKTP));
-        request.files.add(await http.MultipartFile.fromPath(
-            'kenderaan_photo', fotoKendaraan));
-        request.files
-            .add(await http.MultipartFile.fromPath('photo', fotoProfil));
+        // var postUri = Uri.parse('${globals.http_to_server}api/login/daftar1');
+        // var request = http.MultipartRequest("POST", postUri);
+        // request.fields['data'] = jsonEncode(data);
+        // request.files
+        //     .add(await http.MultipartFile.fromPath('ktp_photo', fotoKTP));
+        // request.files.add(await http.MultipartFile.fromPath(
+        //     'ktp_holding_photo', fotoHoldingKTP));
+        // request.files.add(await http.MultipartFile.fromPath(
+        //     'kenderaan_photo', fotoKendaraan));
+        // request.files
+        //     .add(await http.MultipartFile.fromPath('photo', fotoProfil));
 
-        var streamResponse =
-            await request.send().timeout(const Duration(seconds: 120));
-        // var streamResponse = await request.send();
-        var response = await http.Response.fromStream(streamResponse);
+        // var streamResponse =
+        //     await request.send().timeout(const Duration(seconds: 120));
+        // // var streamResponse = await request.send();
+        // var response = await http.Response.fromStream(streamResponse);
 
-        final datanya = jsonDecode(response.body);
+        // final datanya = jsonDecode(response.body);
+
+        var formData = FormData.fromMap({
+          'data': jsonEncode(data),
+          'ktp_photo': await MultipartFile.fromFile(fotoKTP),
+          'ktp_holding_photo': await MultipartFile.fromFile(fotoHoldingKTP),
+          'kenderaan_photo': await MultipartFile.fromFile(fotoKendaraan),
+          'photo': await MultipartFile.fromFile(fotoProfil),
+        });
+
+        var response = await dio.post(
+          '${globals.http_to_server}api/login/daftar1',
+          data: formData,
+          options: Options(
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          ),
+        );
+
+        var datanya = response.data;
 
         log.i(response.statusCode.toString() + " ini status code");
         log.i(datanya.toString());
@@ -116,17 +146,36 @@ class BeforeLoginApi extends GetxController {
           maskType: EasyLoadingMaskType.black,
         );
 
-        var postUri = Uri.parse('${globals.http_to_server}api/login/daftar1');
-        var request = http.MultipartRequest("POST", postUri);
-        request.fields['data'] = jsonEncode(data);
+        // var postUri = Uri.parse('${globals.http_to_server}api/login/daftar1');
+        // var request = http.MultipartRequest("POST", postUri);
+        // request.fields['data'] = jsonEncode(data);
 
-        request.files
-            .add(await http.MultipartFile.fromPath('photo', fotoProfil));
+        // request.files
+        //     .add(await http.MultipartFile.fromPath('photo', fotoProfil));
 
-        var streamResponse =
-            await request.send().timeout(const Duration(seconds: 60));
-        // var streamResponse = await request.send();
-        var response = await http.Response.fromStream(streamResponse);
+        // var streamResponse =
+        //     await request.send().timeout(const Duration(seconds: 60));
+        // // var streamResponse = await request.send();
+        // var response = await http.Response.fromStream(streamResponse);
+
+        // var datanya = jsonDecode(response.body);
+
+        var formData = FormData.fromMap({
+          'data': jsonEncode(data),
+          'photo': await MultipartFile.fromFile(fotoProfil),
+        });
+
+        var response = await dio.post(
+          '${globals.http_to_server}api/login/daftar1',
+          data: formData,
+          options: Options(
+            headers: {
+              'Content-Type': 'multipart/form-data',
+            },
+          ),
+        );
+
+        var datanya = response.data;
 
         // final form = FormData({
         //   'photo': MultipartFile(File(fotoProfil).readAsBytesSync(),
@@ -136,8 +185,6 @@ class BeforeLoginApi extends GetxController {
 
         // final response =
         //     await post('${globals.http_to_server}api/login/daftar1', form);
-
-        var datanya = jsonDecode(response.body);
 
         log.i(response.statusCode.toString() + " ini status code");
         log.i(datanya.toString());
@@ -212,14 +259,26 @@ class BeforeLoginApi extends GetxController {
 
         // var _response = await get(
         //     '${globals.http_to_server}api/login?username=$username&password=$password&role=$role');
-        var uri = Uri.parse(
-            '${globals.http_to_server}api/login?username=$username&password=$password&role=$role');
-        var _response = await http.get(uri, headers: {
-          'Content-Type': 'application/json',
-          "crossDomain": "true",
-        }).timeout(const Duration(seconds: 15));
+        // var uri = Uri.parse(
+        //     '${globals.http_to_server}api/login?username=$username&password=$password&role=$role');
+        // var _response = await http.get(uri, headers: {
+        //   'Content-Type': 'application/json',
+        //   "crossDomain": "true",
+        // }).timeout(const Duration(seconds: 15));
 
-        var _data = jsonDecode(_response.body);
+        // var _data = jsonDecode(_response.body);
+
+        var _response = await dio.get(
+          '${globals.http_to_server}api/login?username=$username&password=$password&role=$role',
+          options: Options(
+            headers: {
+              'Content-Type': 'application/json',
+              "crossDomain": "true",
+            },
+          ),
+        );
+
+        var _data = _response.data;
 
         log.i(_response.statusCode.toString() + " ini status code");
         log.i(_data['data']['_idnya'].toString() + " ini id");
@@ -294,13 +353,25 @@ class BeforeLoginApi extends GetxController {
     );
 
     try {
-      var response =
-          await http.get(Uri.parse("${globals.http_to_server}api"), headers: {
-        "Accept": "application/json",
-        // "authorization":
-        //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
-        "crossDomain": "true"
-      }).timeout(const Duration(seconds: 10));
+      // var response =
+      //     await http.get(Uri.parse("${globals.http_to_server}api"), headers: {
+      //   "Accept": "application/json",
+      //   // "authorization":
+      //   //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+      //   "crossDomain": "true"
+      // }).timeout(const Duration(seconds: 10));
+
+      var response = await dio.get(
+        '${globals.http_to_server}api',
+        options: Options(
+          headers: {
+            'Accept': 'application/json',
+            // "authorization":
+            //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+            "crossDomain": "true"
+          },
+        ),
+      );
       // final data = jsonDecode(response.body);
       if (response.statusCode == 200) {
         result = true;

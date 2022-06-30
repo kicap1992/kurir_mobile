@@ -68,8 +68,7 @@ class _MainWidget extends StatelessWidget {
             if (controller.loadPengiriman.value == 1 &&
                 controller.pengirimanModelList.isEmpty)
               const Center(
-                  child: TiadaDataWIdget(
-                      text: "Tiada data pengiriman\ndalam proses pengesahan")),
+                  child: TiadaDataWIdget(text: "Tiada log history pengiriman")),
             if (controller.loadPengiriman.value == 2)
               const ErrorLoadDataWidget(),
           ],

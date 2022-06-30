@@ -43,7 +43,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await initializeService();
   // await Executor().warmUp(log: true);
-  HttpOverrides.global = MyHttpOverrides();
+  // HttpOverrides.global = MyHttpOverrides();
   await GetStorage.init();
   await _configureLocalTimeZone();
   // await Firebase.initializeApp(

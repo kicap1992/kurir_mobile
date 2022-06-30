@@ -120,6 +120,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.1"
+  dio:
+    dependency: "direct main"
+    description:
+      name: dio
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "4.0.6"
   double_back_to_close_app:
     dependency: "direct main"
     description:
@@ -185,13 +192,6 @@ packages:
     dependency: transitive
     description:
       name: flutter_background_service_platform_interface
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.0"
-  flutter_barcode_scanner:
-    dependency: "direct main"
-    description:
-      name: flutter_barcode_scanner
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.0"
@@ -304,7 +304,7 @@ packages:
     source: hosted
     version: "2.1.7"
   http:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: http
       url: "https://pub.dartlang.org"
