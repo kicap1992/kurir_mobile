@@ -284,10 +284,10 @@ class PendaftaranPengirimController extends GetxController {
         maskType: EasyLoadingMaskType.black,
       );
 
-      final _c = Get.put(BeforeLoginApi());
+      final _api = Get.put(BeforeLoginApi());
 
       Map<String, dynamic> _inidia =
-          await _c.sign_up_pengirim(data, fotoProfil);
+          await _api.sign_up_pengirim(data, fotoProfil);
 
       // final Map<String, dynamic> _inidia = await _api.sign_up_pengirim(
       //   data,

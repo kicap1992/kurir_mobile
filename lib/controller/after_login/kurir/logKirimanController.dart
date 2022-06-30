@@ -17,7 +17,7 @@ class LogKirimanControllerKurir extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    dev.i("sini on init log kiriman controller kurir");
+    // dev.i("sini on init log kiriman controller kurir");
     pengirimanAll();
   }
 
@@ -34,7 +34,7 @@ class LogKirimanControllerKurir extends GetxController {
         pengirimanModelList.value =
             _data['data'].map((e) => PengirimanModel.fromJson(e)).toList();
 
-        dev.d("pengirimanModelList: $pengirimanModelList");
+        // dev.d("pengirimanModelList: $pengirimanModelList");
       } else {
         pengirimanModelList.value = [];
       }

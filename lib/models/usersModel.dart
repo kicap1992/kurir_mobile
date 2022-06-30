@@ -5,6 +5,7 @@
 class KurirModel {
   String? id;
   String? nama;
+  String? nik;
   String? email;
   String? no_telp;
   String? alamat;
@@ -18,6 +19,7 @@ class KurirModel {
   KurirModel({
     this.id,
     this.nama,
+    this.nik,
     this.email,
     this.no_telp,
     this.alamat,
@@ -32,6 +34,7 @@ class KurirModel {
   factory KurirModel.fromJson(Map<String, dynamic> json) => KurirModel(
         id: json["_id"],
         nama: json["nama"],
+        nik: json["nik"],
         email: json["email"],
         no_telp: json["no_telp"],
         alamat: json["alamat"],
@@ -46,6 +49,7 @@ class KurirModel {
   Map<String, dynamic> toJson() => {
         "_id": id,
         "nama": nama,
+        "nik": nik,
         "email": email,
         "no_telp": no_telp,
         "alamat": alamat,

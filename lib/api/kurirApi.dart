@@ -2,15 +2,18 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
+
 import 'dart:io';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:http/http.dart' as http;
+import 'package:logger/logger.dart';
 import '../globals.dart' as globals;
 
-class KurirApi extends GetConnect {
+class KurirApi extends GetxController {
+  final dev = Logger();
+
   static var storage = GetStorage();
 
   static var username = storage.read("username");
@@ -174,7 +177,6 @@ class KurirApi extends GetConnect {
       );
 
       try {
-        log("${globals.http_to_server}api/kurir/pengaturan?username=$username&password=$password&id=$id");
         var response = await http.get(
             Uri.parse(
                 "${globals.http_to_server}api/kurir/pengaturan?username=$username&password=$password&id=$id"),
@@ -185,8 +187,6 @@ class KurirApi extends GetConnect {
               "crossDomain": "true"
             }).timeout(const Duration(seconds: 10));
         final data = jsonDecode(response.body);
-        log(data.toString());
-        log("ini status : " + response.statusCode.toString());
         if (response.statusCode == 200) {
           result = {
             'status': 200,
@@ -266,8 +266,6 @@ class KurirApi extends GetConnect {
               "biaya_per_kilo": biayaPerKilo
             }).timeout(const Duration(seconds: 10));
         final data = jsonDecode(response.body);
-        log(data.toString());
-        log("ini status : " + response.statusCode.toString());
         if (response.statusCode == 200) {
           result = {'status': 200, 'message': data['message'], 'data': data};
         } else {
@@ -571,6 +569,76 @@ class KurirApi extends GetConnect {
       result = false;
     } finally {
       await EasyLoading.dismiss();
+    }
+
+    return result;
+  }
+
+  Future<Map<String, dynamic>> profileKurir2() async {
+    late Map<String, dynamic> result;
+
+    bool _checkServer = await cek_jaringan();
+
+    if (_checkServer) {
+      try {
+        var response = await http.get(
+            Uri.parse(
+                "${globals.http_to_server}api/kurir/profil_kurir?username=$username&password=$password&id=$id"),
+            headers: {
+              "Accept": "application/json",
+              // "authorization":
+              //     "Basic ${base64Encode(utf8.encode("Kicap_karan:bb10c6d9f01ec0cb16726b59e36c2f73"))}",
+              "crossDomain": "true"
+            }).timeout(const Duration(seconds: 10));
+
+        final data = jsonDecode(response.body);
+        dev.i(data);
+        if (response.statusCode == 200) {
+          result = {
+            'status': 200,
+            'message': data['message'],
+            'data': data['data']
+          };
+        } else {
+          result = {
+            'status': response.statusCode,
+            'message': data['message'],
+            'data': data
+          };
+        }
+      } on SocketException {
+        // abort the client
+        // closeClient();
+
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on TimeoutException {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } on Exception {
+        // client.close();
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } catch (e) {
+        result = {
+          'status': 500,
+          'message': "Tidak dapat terhubung ke server,koneksi timeout"
+        };
+      } finally {
+        await EasyLoading.dismiss();
+      }
+    } else {
+      result = {
+        'status': 500,
+        'message': "Tidak dapat terhubung ke server,koneksi timeout"
+      };
     }
 
     return result;

@@ -1,6 +1,5 @@
 // ignore_for_file: file_names, non_constant_identifier_names
 
-import 'dart:developer' as dev;
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_polyline_points/flutter_polyline_points.dart';
@@ -11,8 +10,12 @@ import 'package:kurir/globals.dart' as globals;
 import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:kurir/models/pengirimimanModel.dart';
+import 'package:logger/logger.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 
 class InfoPengirimanController extends GetxController {
+  final dev = Logger();
+
   final dynamic _argumicData = Get.arguments;
   late PengirimanModel pengirimanModel;
   // late String jumlah_pembayaran;
@@ -40,7 +43,6 @@ class InfoPengirimanController extends GetxController {
     // ignore: todo
     // TODO: implement onInit
     pengirimanModel = _argumicData['pengiriman_model'];
-    dev.log(" ini idnya ${pengirimanModel.fotoPengiriman}");
     distance_travel_controller.text = "loading...";
     price_controller.text = "loading...";
     set_the_maps(pengirimanModel.kordinatPengiriman!,
@@ -403,6 +405,38 @@ class InfoPengirimanController extends GetxController {
           //     ),
           //   ),
           // ),
+        ),
+      ),
+    );
+  }
+
+  showQRcodeDialog() {
+    dev.i("sini untuk tampilkan dialog");
+
+    Get.dialog(
+      const _QRcodeTerimaPengirim(),
+    );
+  }
+}
+
+class _QRcodeTerimaPengirim extends StatelessWidget {
+  const _QRcodeTerimaPengirim({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("QR Code"),
+      content: Container(
+        alignment: Alignment.center,
+        height: 200,
+        width: double.infinity,
+        child: QrImage(
+          data: "heheheh",
+          version: QrVersions.auto,
+          gapless: false,
+          size: 200,
         ),
       ),
     );

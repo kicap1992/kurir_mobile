@@ -40,7 +40,9 @@ class InfoPengirimanPage extends GetView<InfoPengirimanController> {
                 Row(
                   children: [
                     IconButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        controller.showQRcodeDialog();
+                      },
                       icon: const Icon(
                         Icons.qr_code_2_outlined,
                         color: Colors.white,
@@ -173,24 +175,23 @@ class InfoPengirimanPage extends GetView<InfoPengirimanController> {
                       const SizedBox(
                         height: 15,
                       ),
-                      (controller.pengirimanModel.statusPengiriman ==
-                              "Dalam Pengesahan Kurir")
-                          ? Center(
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  primary: Colors.red,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                                child: const Text("Batalkan Pengiriman"),
-                                onPressed: () {},
+                      if (controller.pengirimanModel.statusPengiriman ==
+                          "Dalam Pengesahan Kurir")
+                        Center(
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.red,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                            )
-                          : (controller.pengirimanModel.statusPengiriman ==
-                                  "Mengambil Paket Pengiriman Dari Pengirim")
-                              ? const _ButtonKurirDalamPerjalan()
-                              : const SizedBox(),
+                            ),
+                            child: const Text("Batalkan Pengiriman"),
+                            onPressed: () {},
+                          ),
+                        ),
+                      if (controller.pengirimanModel.statusPengiriman ==
+                          "Mengambil Paket Pengiriman Dari Pengirim")
+                        _ButtonKurirDalamPerjalan(controller: controller),
                     ],
                   ),
                 ),
@@ -209,8 +210,10 @@ class InfoPengirimanPage extends GetView<InfoPengirimanController> {
 class _ButtonKurirDalamPerjalan extends StatelessWidget {
   const _ButtonKurirDalamPerjalan({
     Key? key,
+    required this.controller,
   }) : super(key: key);
 
+  final InfoPengirimanController controller;
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -225,7 +228,9 @@ class _ButtonKurirDalamPerjalan extends StatelessWidget {
               ),
             ),
             child: const Text("Scan QR Code"),
-            onPressed: () {},
+            onPressed: () {
+              controller.showQRcodeDialog();
+            },
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(

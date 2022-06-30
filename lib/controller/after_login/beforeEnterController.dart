@@ -90,6 +90,7 @@ class BeforeEnterController extends GetxController {
     if (_role.toLowerCase() == "kurir") {
       Get.offAllNamed(
         '/kurirIndex',
+        arguments: 1,
       );
       return;
     }

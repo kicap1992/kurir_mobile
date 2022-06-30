@@ -35,8 +35,8 @@ class PengirimanKurirController extends GetxController {
   );
 
   @override
-  void onReady() {
-    super.onReady();
+  void onInit() {
+    super.onInit();
     pengirimanAll();
   }
 
@@ -248,6 +248,11 @@ class PengirimanKurirController extends GetxController {
       maskType: EasyLoadingMaskType.black,
     );
 
+    // final ctrl = Get.put<PengirimanKurirController>(
+    //   PengirimanKurirController(),
+    // );
+    // ctrl.onInit();
+
     final _api = Get.put(KurirApi());
 
     Map<String, dynamic> _data = await _api.sahkanPengiriman(id);
@@ -265,17 +270,11 @@ class PengirimanKurirController extends GetxController {
         snackPosition: SnackPosition.TOP,
       );
 
-      // Get.back();
-      // futre 1 sec
-      // await Future.delayed(Duration(seconds: 1));
-      // loadPengiriman.value = 0;
-      // pengirimanModelList.value = [];
-      // await pengirimanAll();
-      // onReady();
-      final ctrl = Get.put<PengirimanKurirController>(
-        PengirimanKurirController(),
+      Get.offAllNamed(
+        '/kurirIndex',
+        arguments: 1,
       );
-      ctrl.onReady();
+      // onInit();
     } else {
       Get.snackbar(
         "Info",
@@ -340,17 +339,10 @@ class PengirimanKurirController extends GetxController {
         snackPosition: SnackPosition.TOP,
       );
 
-      // Get.back();
-      // futre 1 sec
-      // await Future.delayed(Duration(seconds: 1));
-      // loadPengiriman.value = 0;
-      // pengirimanModelList.value = [];
-      // await pengirimanAll();
-      // onReady();
-      final ctrl = Get.put<PengirimanKurirController>(
-        PengirimanKurirController(),
+      Get.offAllNamed(
+        '/kurirIndex',
+        arguments: 1,
       );
-      ctrl.onReady();
     } else {
       Get.snackbar(
         "Info",

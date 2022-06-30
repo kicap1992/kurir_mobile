@@ -14,10 +14,11 @@ import 'pengirimanController.dart';
 class KurirIndexController extends GetxController {
   late Socket socket;
 
+  int id = Get.arguments;
+
   final Rx<int> _indexTap = 0.obs; // bottom navigation index tap
 
-  PageController pageController =
-      PageController(initialPage: 0, keepPage: true);
+  late PageController pageController;
 
   pageChanged(int index) async {
     _indexTap.value = index;
@@ -49,6 +50,12 @@ class KurirIndexController extends GetxController {
         // Get.put(PengaturanKurirController());
 
         break;
+      // case 3:
+      //   final ctrl = Get.put<KurirProfileController>(
+      //     KurirProfileController(),
+      //   );
+      //   ctrl.onInit();
+      //   break;
       default:
     }
   }
@@ -58,8 +65,10 @@ class KurirIndexController extends GetxController {
     log('KurirIndexController onInit');
     // final ctrl = Get.put(PengaturanKurirController());
     // ctrl.onInit();
-    connectToServer();
+    // connectToServer();
     super.onInit();
+    _indexTap.value = id;
+    pageController = PageController(initialPage: id, keepPage: false);
   }
 
   BottomNavigationBar bottomNavigationBar(context) {
@@ -94,7 +103,7 @@ class KurirIndexController extends GetxController {
     log("sini on item tapped");
     _indexTap.value = index;
     if (index == 3) {
-      Get.offAllNamed('/kurirIndex/profileKurir');
+      Get.toNamed('/kurirIndex/profileKurir');
     }
     FocusScope.of(context).unfocus();
     // Get.delete<PengaturanKurirController>();
@@ -120,7 +129,7 @@ class KurirIndexController extends GetxController {
       });
       // Connect to websocket
       // socket.connect();
-      socket.on('connect', (_) => log('connect asdasdsad: ${socket.id}'));
+      socket.on('connect', (_) => log('connect : ${socket.id}'));
       socket.on('coba1', (_) => log(_.toString() + " ini coba2"));
 
       log(socket.connected.toString());

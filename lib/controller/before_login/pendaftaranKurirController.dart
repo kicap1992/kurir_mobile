@@ -363,9 +363,9 @@ class PendaftaranKurirController extends GetxController {
         maskType: EasyLoadingMaskType.black,
       );
 
-      final _c = Get.put(BeforeLoginApi());
+      final _api = Get.put(BeforeLoginApi());
 
-      Map<String, dynamic> inidia = await _c.sign_up_kurir(
+      Map<String, dynamic> inidia = await _api.sign_up_kurir(
           data, fotoKTP, fotoHoldingKTP, fotoKendaraan, fotoProfil);
 
       late String title, content;

@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../binding/beforeEnterBinding.dart';
 import '../binding/infoPengirimanBinding.dart';
 import '../binding/kurirIndexBinding.dart';
-import '../binding/kurirProfileBinding.dart';
+// import '../binding/kurirProfileBinding.dart';
 import '../binding/loginBinding.dart';
 import '../binding/pendaftaranKurirBinding.dart';
 import '../binding/pendaftaranPengirim.dart';
@@ -106,7 +106,7 @@ class Routes {
           GetPage(
             name: '/profileKurir',
             page: () => const ProfileKurirPage(),
-            binding: KurirProfileBinding(),
+            // binding: KurirProfileBinding(),
             transition: Transition.native,
             transitionDuration: const Duration(seconds: 1),
             curve: Curves.easeInOut,

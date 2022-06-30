@@ -2,8 +2,10 @@
 
 import 'package:enhance_stepper/enhance_stepper.dart';
 import 'package:flutter/material.dart';
+// import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:get/get.dart';
 import 'package:logger/logger.dart';
+import 'package:scan/scan.dart';
 
 import '../../../api/kurirApi.dart';
 import '../../../function/allFunction.dart';
@@ -30,9 +32,10 @@ class ProgressPenghantaranControllerKurir extends GetxController {
   void onInit() {
     super.onInit();
     // text.value = "heheh222";
-    dev.i("disini progress penghantaran bagian kurir berlaku");
+    dev.i(id);
 
     // future 3 sec
+
     getData();
   }
 
@@ -130,16 +133,17 @@ class ProgressPenghantaranControllerKurir extends GetxController {
           ),
         );
         _content = _MengambilPaketKirimanRichtext(
-            terima: (pengiriman.statusPengiriman ==
-                    "Mengambil Paket Pengiriman Dari Pengirim")
-                ? true
-                : false,
-            waktu: (pengiriman.statusPengiriman !=
-                        "Mengambil Paket Pengiriman Dari Pengirim" ||
-                    pengiriman.statusPengiriman != "Disahkan Kurir" ||
-                    pengiriman.statusPengiriman != "Dalam Pengesahan Kurir")
-                ? AllFunction.timeZoneAdd8(pengiriman.history![3].waktu)
-                : null);
+          terima: (pengiriman.statusPengiriman ==
+                  "Mengambil Paket Pengiriman Dari Pengirim")
+              ? true
+              : false,
+          waktu: (pengiriman.statusPengiriman !=
+                      "Mengambil Paket Pengiriman Dari Pengirim" &&
+                  pengiriman.statusPengiriman != "Disahkan Kurir" &&
+                  pengiriman.statusPengiriman != "Dalam Pengesahan Kurir")
+              ? AllFunction.timeZoneAdd8(pengiriman.history![3].waktu)
+              : null,
+        );
         break;
       case "Menghantar Paket Pengiriman Ke Penerima":
         _icon = const Icon(
@@ -154,7 +158,35 @@ class ProgressPenghantaranControllerKurir extends GetxController {
             fontSize: 20,
           ),
         );
-        _content = const _MenghantarPaketKirimanRichtext();
+        _content = _MenghantarPaketKirimanRichtext(
+            terima: (pengiriman.statusPengiriman ==
+                    "Menghantar Paket Pengiriman Ke Penerima")
+                ? true
+                : false,
+            waktu: (pengiriman.statusPengiriman !=
+                        "Menghantar Paket Pengiriman Ke Penerima" &&
+                    pengiriman.statusPengiriman !=
+                        "Mengambil Paket Pengiriman Dari Pengirim" &&
+                    pengiriman.statusPengiriman != "Disahkan Kurir" &&
+                    pengiriman.statusPengiriman != "Dalam Pengesahan Kurir")
+                ? AllFunction.timeZoneAdd8(pengiriman.history![4].waktu)
+                : null);
+        break;
+      case "Paket Diterima Oleh Penerima":
+        _icon = const Icon(
+          Icons.person_pin_sharp,
+          color: Colors.white,
+          size: 30,
+        );
+        _title = const Text(
+          "Paket telah diterima oleh penerima",
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+          ),
+        );
+        _content =
+            _PaketDiterimaRichtext(waktu: AllFunction.timeZoneAdd8(data.waktu));
         break;
     }
 
@@ -166,69 +198,226 @@ class ProgressPenghantaranControllerKurir extends GetxController {
       isActive: true,
     );
   }
+
+  Future<void> onQRViewCreated(BuildContext context, String aksinya) async {
+    Get.dialog(
+      QRcodeScannerWidget(),
+    );
+  }
+}
+
+class QRcodeScannerWidget extends StatefulWidget {
+  const QRcodeScannerWidget({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  State<QRcodeScannerWidget> createState() => _QRcodeScannerWidgetState();
+}
+
+class _QRcodeScannerWidgetState extends State<QRcodeScannerWidget> {
+  // final ProgressPenghantaranControllerKurir c =
+  ScanController qRcontroller = ScanController();
+
+  final dev = Logger();
+  bool _isScanning = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Color.fromARGB(255, 199, 214, 234),
+      title: const Text("Scan QRCode"),
+      content: SizedBox(
+        width: 250, // custom wrap size
+        height: 250,
+        child: ScanView(
+          controller: qRcontroller,
+          // custom scan area, if set to 1.0, will scan full area
+          scanAreaScale: .8,
+          scanLineColor: Colors.green.shade400,
+          onCapture: (data) {
+            // do something
+            // dev.i(data);
+            if (data == "hehehe") {
+              // Get.back();
+              setState(() {
+                _isScanning = false;
+              });
+              Get.snackbar(
+                "Success",
+                "QRCode berhasil ditambahkan",
+                snackPosition: SnackPosition.TOP,
+                backgroundColor: Colors.green,
+                borderRadius: 10,
+                margin: EdgeInsets.all(10),
+                borderColor: Colors.green,
+                borderWidth: 2,
+                duration: Duration(seconds: 2),
+              );
+            } else {
+              setState(() {
+                _isScanning = false;
+              });
+              qRcontroller.resume();
+            }
+          },
+        ),
+      ),
+      actions: <Widget>[
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: const Color.fromARGB(255, 2, 72, 72),
+          ),
+          onPressed: () {
+            if (_isScanning) {
+              qRcontroller.pause();
+            } else {
+              qRcontroller.resume();
+            }
+            setState(() {
+              _isScanning = !_isScanning;
+            });
+          },
+          child: Text(_isScanning ? "Pause" : "Resume"),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            primary: const Color.fromARGB(255, 2, 72, 72),
+          ),
+          onPressed: () {
+            qRcontroller.toggleTorchMode();
+          },
+          child: const Text("Flash"),
+        ),
+      ],
+    );
+  }
+}
+
+class _PaketDiterimaRichtext extends StatelessWidget {
+  const _PaketDiterimaRichtext({
+    Key? key,
+    required this.waktu,
+  }) : super(key: key);
+
+  final String waktu;
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      textAlign: TextAlign.justify,
+      text: TextSpan(
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 15,
+        ),
+        children: [
+          const TextSpan(
+              text:
+                  "Paket diterima oleh penerima, penerima mengkonfirmasi penerimaan paket pada waktu \n"),
+          TextSpan(
+            text: waktu,
+            style: const TextStyle(
+              fontStyle: FontStyle.italic,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _MenghantarPaketKirimanRichtext extends StatelessWidget {
   const _MenghantarPaketKirimanRichtext({
     Key? key,
+    required this.terima,
+    this.waktu,
   }) : super(key: key);
+
+  final bool terima;
+  final String? waktu;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        RichText(
-          textAlign: TextAlign.justify,
-          text: const TextSpan(
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 15,
+        if (terima)
+          RichText(
+            textAlign: TextAlign.justify,
+            text: const TextSpan(
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+              ),
+              children: [
+                TextSpan(
+                    text:
+                        "Paket diterima dari pengirim. Dalam perjalanan menghantar paket ke penerima. Klik "),
+                TextSpan(
+                  text: "'Terima Paket Pengiriman' ",
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextSpan(text: "jika sampai ke lokasi penerima & scan "),
+                TextSpan(
+                  text: "QRcode ",
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextSpan(text: "yang ada pada aplikasi pengirim. Klik "),
+                TextSpan(
+                  text: "'Rute Lokasi' ",
+                  style: TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                TextSpan(text: "untuk melihat rute lokasi penerima."),
+              ],
             ),
-            children: [
-              TextSpan(
-                  text:
-                      "Paket diterima dari pengirim. Dalam perjalanan menghantar paket ke penerima. Klik "),
-              TextSpan(
-                text: "'Terima Paket Pengiriman' ",
-                style: TextStyle(
-                  fontStyle: FontStyle.italic,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              TextSpan(text: "jika sampai ke lokasi penerima & scan "),
-              TextSpan(
-                text: "QRcode ",
-                style: TextStyle(
-                  fontStyle: FontStyle.italic,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              TextSpan(text: "yang ada pada aplikasi pengirim. Klik "),
-              TextSpan(
-                text: "'Rute Lokasi' ",
-                style: TextStyle(
-                  fontStyle: FontStyle.italic,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              TextSpan(text: "untuk melihat rute lokasi penerima."),
-            ],
           ),
-        ),
+        if (!terima)
+          RichText(
+            textAlign: TextAlign.justify,
+            text: TextSpan(
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+              ),
+              children: [
+                const TextSpan(
+                    text:
+                        "Paket diterima dari pengirim. Telah diterima oleh penerima pada waktu \n"),
+                TextSpan(
+                  text: waktu,
+                  style: const TextStyle(
+                    fontStyle: FontStyle.italic,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
         const SizedBox(
           height: 10,
         ),
-        SizedBox(
-          width: double.infinity,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: const [
-              _ExpandedButton(flex: 2, text: 'Serahkan Paket\nPengiriman'),
-              Expanded(flex: 1, child: SizedBox()),
-              _ExpandedButton(flex: 2, text: 'Rute Lokasi'),
-            ],
+        if (terima)
+          SizedBox(
+            width: double.infinity,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: const [
+                _ExpandedButton(flex: 2, text: 'Serahkan Paket\nPengiriman'),
+                Expanded(flex: 1, child: SizedBox()),
+                _ExpandedButton(flex: 2, text: 'Rute Lokasi'),
+              ],
+            ),
           ),
-        ),
       ],
     );
   }
@@ -245,6 +434,9 @@ class _MengambilPaketKirimanRichtext extends StatelessWidget {
   final String? waktu;
 
   final dev = Logger();
+  final ProgressPenghantaranControllerKurir controller =
+      Get.put<ProgressPenghantaranControllerKurir>(
+          ProgressPenghantaranControllerKurir());
 
   @override
   Widget build(BuildContext context) {
@@ -307,10 +499,18 @@ class _MengambilPaketKirimanRichtext extends StatelessWidget {
             width: double.infinity,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: const [
-                _ExpandedButton(flex: 2, text: 'Terima Paket\nPengiriman'),
-                Expanded(flex: 1, child: SizedBox()),
-                _ExpandedButton(flex: 2, text: 'Rute Lokasi'),
+              children: [
+                _ExpandedButton(
+                  flex: 2,
+                  text: 'Terima Paket\nPengiriman',
+                  onPressed: () {
+                    dev.i("terima paket");
+                    controller.onQRViewCreated(context, "Pengirim");
+                    // Get.to(CobaPageKurir());
+                  },
+                ),
+                const Expanded(flex: 1, child: SizedBox()),
+                const _ExpandedButton(flex: 2, text: 'Rute Lokasi'),
               ],
             ),
           ),
@@ -320,14 +520,13 @@ class _MengambilPaketKirimanRichtext extends StatelessWidget {
 }
 
 class _ExpandedButton extends StatelessWidget {
-  const _ExpandedButton({
-    Key? key,
-    required this.text,
-    required this.flex,
-  }) : super(key: key);
+  const _ExpandedButton(
+      {Key? key, required this.text, required this.flex, this.onPressed})
+      : super(key: key);
 
   final String text;
   final int flex;
+  final Function? onPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -344,7 +543,9 @@ class _ExpandedButton extends StatelessWidget {
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
-            onPressed: () {},
+            onPressed: () {
+              if (onPressed != null) onPressed!();
+            },
             child: FittedBox(
               child: Text(
                 text,

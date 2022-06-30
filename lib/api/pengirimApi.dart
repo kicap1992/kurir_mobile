@@ -11,7 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import '../globals.dart' as globals;
 
-class PengirimApi extends GetConnect {
+class PengirimApi extends GetxController {
   static var storage = GetStorage();
 
   static var username = storage.read("username");

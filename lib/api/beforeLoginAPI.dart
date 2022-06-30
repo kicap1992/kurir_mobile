@@ -11,7 +11,7 @@ import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
 import '../globals.dart' as globals;
 
-class BeforeLoginApi extends GetConnect {
+class BeforeLoginApi extends GetxController {
   static final log = Logger();
   static var storage = GetStorage();
 

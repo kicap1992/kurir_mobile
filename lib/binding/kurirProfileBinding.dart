@@ -8,6 +8,8 @@ class KurirProfileBinding extends Bindings {
 
   @override
   void dependencies() {
-    Get.lazyPut<KurirProfileController>(() => KurirProfileController());
+    // Get.lazyPut<KurirProfileController>(() => KurirProfileController());
+    // Get.lazyPut<KurirApi>(() => KurirApi());
+    Get.put(KurirProfileController());
   }
 }
